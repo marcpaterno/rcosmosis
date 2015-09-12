@@ -74,16 +74,28 @@ make.matterpower.dataframe <- function(dirname, type)
   dframe
 }
 
-#' Create a dataframe from CosmoSIS MCMC output. We expect the first line of
-#' the output to contain the names of the parameters, separated by
-#' spaces, and with section names separated from parameter names by a
-#' double-hyphen.
+#' Create a data frame from CosmoSIS MCMC sampler output.
+#'
+#' Reads a file in CosmoSIS MCMC sampler output format and creates a data frame
+#' from it. Each line in the file corresponds to a sample in the data frame;
+#' each column in the file corresponds to a column in the data frame.
+#'
+#'
+#' The columns in a CosmoSIS MCMC data frame are: \describe{
+#' \item{loglike}{log-likelihood of the sample.} \item{like}{normalized
+#' likelihood of the sample.} \item{\emph{others}}{one column per sampled
+#' variable in the MCMC output, named as in the output.} }
+#'
+#' We expect the first line of the output to contain the names of the
+#' parameters, separated by spaces, and with section names separated from
+#' parameter names by a double-hyphen.
+#'
 #' @export
-#' @param fname The name of the file to be read.
-#' @param burn The length of the burn-in period; these samples are ignored in making the dataframe.
-#' @return a CosmoSIS MCMC dataframe. The columns are:
-#'   `l`
-make.data.frame <- function(fname, burn)
+#' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
+#' @param burn The length of the burn-in period; these samples are ignored in
+#'   making the data frame.
+#' @return a CosmoSIS MCMC data frame.
+read.cosmosis.mcmc <- function(fname, burn)
 {
   d <- read.table(fname)
   # Remove the first 'burn' elements
@@ -92,11 +104,14 @@ make.data.frame <- function(fname, burn)
   first <- sub("#", "", first)           # Remove comment
   parts <- strsplit(first, "\t")[[1]]    # split on tabs
   cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
+  cols <- sub("like", "loglike", cols, fixed = TRUE)
   names(d) <- cols
-  likes <- exp(d$LIKE)
+  likes <- exp(d$loglike)
   norm <- sum(likes)
-  d$l <- likes/norm
+  d$like <- likes/norm
   return(d)
 }
 
-#' Create a dataframe from CosmoSIS grid sampler output.
+#' Create a data frame from CosmoSIS grid sampler output.
+#'
+#' Reads a file in CosmoSIS grid sampler output format and creates a data frame from it.
