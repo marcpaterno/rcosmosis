@@ -10,14 +10,17 @@ Description: rcosmosis provides functions useful in the analysis of the
     community at large. CosmoSIS is available at
     https://bitbucket.org/joezuntz/cosmosis.
 Requires: R (>= 3.2.0)
-Depends:
+Depends: lattice
+Imports:
+    DBI,
     MASS,
     RSQLite,
     doBy,
-    lattice,
     latticeExtra,
-    optparse
-License: BSD
+    optparse,
+    reshape2,
+    tools
+License: MIT
 LazyData: true
 Suggests:
     testthat

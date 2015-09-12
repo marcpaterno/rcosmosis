@@ -1,31 +1,28 @@
-library(DBI)
-library(RSQLite)
-library(lattice)
-library(latticeExtra)
-library(reshape2)
-library(tools)
 
+#'
 #' Create a single "distance plot". A distance plot is always a plot of
 #' something as a function of reshift "z'. The plot is written to a file,
 #' using the specified device. All additional arguments are passed to the
 #' device function.
+#' @export
 #' @return nothing; used for side-effect
 #' @param colname As a string, the name of the column from the dataframe to be used on the y-axis.
-#' @param dframe A 
+#' @param dframe A
 make.distance.plot <- function(colname, dframe, prefix, outdir, verbose, devname, ...)
 {
   device.fcn = get(devname)
-  plotfile <- paste(outdir, "/", prefix, "_", colname, ".", devname, sep="")
+  plotfile <- paste(outdir, "/", prefix, "_", colname, ".", devname, sep = "")
   if (verbose) cat("Plotting", colname, "versus z into", plotfile, "\n")
   device.fcn(plotfile, ...)
-  print(xyplot( as.formula(paste(colname, "~z"))
-              , dframe
-              , xlab="Redshift z"
-              , ylab=toupper(colname)
-              , grid=TRUE
-              , type="l",
-              , lwd = 2
+  print(xyplot(as.formula(paste(colname, "~z")),
+               dframe,
+               xlab = "Redshift z",
+               ylab = toupper(colname),
+               grid = TRUE,
+               type = "l",
+               lwd = 2
               ))
+
   invisible(dev.off())
 }
 
@@ -33,19 +30,20 @@ make.distance.plot <- function(colname, dframe, prefix, outdir, verbose, devname
 #' plot of something as a function of C_ell. The plot is written to
 #' a file, using the specified device. All additional arguments are
 #' passed to the device function.
+#' @export
 make.cmb.spectrum.plot <- function(colname, dframe, prefix, outdir, verbose, devname, ...)
 {
   device.fcn <- get(devname)
-  plotfile <- paste(outdir, "/", prefix, "_", colname, ".", devname, sep="")
+  plotfile <- paste(outdir, "/", prefix, "_", colname, ".", devname, sep = "")
   if (verbose) cat("Plotting", colname, "versus ell into", plotfile, "\n")
   device.fcn(plotfile, ...)
-  print(xyplot( as.formula(paste(colname, "~ell"))
-              , dframe
-              , xlab = "ell"
-              , ylab = paste("C_ell ", toupper(colname), "/uK^2", sep="")
-              , grid=TRUE
-              , type="l",
-              , lwd = 2
+  print(xyplot( as.formula(paste(colname, "~ell")),
+                dframe,
+                xlab = "ell",
+                ylab = paste("C_ell ", toupper(colname), "/uK^2", sep = ""),
+                grid = TRUE,
+                type = "l",
+                lwd = 2
               ))
   invisible(dev.off())
 }
@@ -53,25 +51,25 @@ make.cmb.spectrum.plot <- function(colname, dframe, prefix, outdir, verbose, dev
 #' Create the CMB spectrum plot with all spectra shown together. Because
 #' some of the spectra may have negative values, we take the absolute
 #' value (so that our log-log plot doesn't complain).
+#' @export
 make.cmb.grand.spectrum.plot <- function(dframe, prefix, outdir, verbose, devname, ...)
 {
   device.fcn <- get(devname)
-  plotfile <- paste(outdir, "/", prefix, "_grand.", devname, sep="")
-  if (verbose)
-    cat("Plotting all spectra versus ell into", plotfile, "\n")
+  plotfile <- paste(outdir, "/", prefix, "_grand.", devname, sep = "")
+  if (verbose) cat("Plotting all spectra versus ell into", plotfile, "\n")
   device.fcn(plotfile, ...)
-  print(xyplot( abs(value)~ell
-              , dframe
-              , xlab="ell"
-              , ylab="C_ell spectra / uK^2"
-              , grid=TRUE
-              , type="l",
-              , lwd = 2
-              , group = variable
-              , auto.key = list(space="right", points=FALSE, lines=TRUE)
-              , scales = scales.log.log()
-              , xscale.components = xscale.log()
-              , yscale.components = yscale.log()
+  print(xyplot(abs(value) ~ ell,
+               dframe,
+               xlab = "ell",
+               ylab = "C_ell spectra / uK^2",
+               grid = TRUE,
+               type = "l",
+               lwd = 2,
+               #group = variable,
+               auto.key = list(space = "right", points = FALSE, lines = TRUE),
+               scales = scales.log.log(),
+               xscale.components = xscale.log(),
+               yscale.components = yscale.log()
               ))
   invisible(dev.off())
 }
@@ -79,6 +77,7 @@ make.cmb.grand.spectrum.plot <- function(dframe, prefix, outdir, verbose, devnam
 #' Make all the distance plots for files under the given top-level
 #' directory *topdir*. Distance plots are made for data files in the
 #' subdirectory "distances".
+#' @export
 make.distance.plots <- function(topdir, verbose, prefix, outdir, devname)
 {
   # data files are in "distances".
@@ -87,12 +86,11 @@ make.distance.plots <- function(topdir, verbose, prefix, outdir, devname)
 
   # We don't want to read the "values.txt" file.
   excluded <- file.path(datadir, "values.txt")
-  files <- Filter(function(x) {x!=excluded}, dir(datadir, full.names=TRUE))
+  files <- Filter(function(x) {x != excluded}, dir(datadir, full.names = TRUE))
 
   # Create a dataframe from all the named files.
   dframe <- make.theory.dataframe(files)
-  if (verbose)
-     cat("Made the data frame for distances\n")
+  if (verbose) cat("Made the data frame for distances\n")
 
   # If we have a "h" column, we want to scale it. We do it here because
   # this is the function that knows about the nature of the directory
@@ -109,6 +107,7 @@ make.distance.plots <- function(topdir, verbose, prefix, outdir, devname)
 #' Make all the CMB spectrum plots for files under the given top-level
 #' directory *topdir*. CMB spectrum plots are made for all data files in
 #' the subdirectory "cmb_cl".
+#' @export
 make.cmb.spectrum.plots <- function(topdir, verbose, prefix, outdir, devname)
 {
   # data files are in "cmb_cl"
@@ -176,7 +175,7 @@ make.matter.power.plots <- function(topdir, verbose, prefix, outdir, devname)
 make.data.frame <- function(fname)
 {
   d <- read.table(fname)
-  first <- readLines(fname, n=1)
+  first <- readLines(fname, n = 1)
   first <- sub("#", "", first)          # Remove comment
   parts <- strsplit(first, "\t")[[1]]   # split on tabs
   cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
@@ -195,18 +194,18 @@ make.data.frame <- function(fname)
 make.1d.likelihood.plots <- function(dframe, prefix, output, device, verbose)
 {
   cols <- Filter(function(n) { ! n %in% c("l","LIKE") }, names(dframe))
-  for(col in cols)
+  for (col in cols)
   {
     if (verbose) cat("Making 1-d density plot for", col, "\n")
-    form <- as.formula(paste("l~", col, sep=""))
-    dframe.summary <- summaryBy(form, data = dframe, FUN=sum)
+    form <- as.formula(paste("l~", col, sep = ""))
+    dframe.summary <- doBy::summaryBy(form, data = dframe, FUN = sum)
     names(dframe.summary)[2] <- "l" # Replace ugly name generated by summaryBy
     dev.fcn <- get(device)
-    filename <- file.path(output, paste(prefix, "_", col, ".", device, sep=""))
+    filename <- file.path(output, paste(prefix, "_", col, ".", device, sep = ""))
     p1 <- xyplot( form
                 , dframe.summary
-                , type="l"
-                , lwd=2
+                , type = "l"
+                , lwd = 2
                 , ylab = "likelihood"
                 , grid = TRUE
                 )
@@ -220,18 +219,19 @@ make.1d.likelihood.plots <- function(dframe, prefix, output, device, verbose)
 #' regions containing the probability contents 'levels'.
 find.contours <- function(dframe, levels = c(0.68, 0.95))
 {
-  probs.sorted <- sort(dframe$l, decreasing=TRUE)
+  probs.sorted <- sort(dframe$l, decreasing = TRUE)
   probs.cs <- cumsum(probs.sorted)
   # Get the indices of the first values greater than the given confidence levels.
-  indices <- sapply( levels
-                   , function(x) which(probs.cs>x)[1]
-                   )
+  indices <- sapply(levels, function(x) which(probs.cs > x)[1])
   probs.sorted[indices]
 }
 
 #' vmat2df will convert the kind of list returned by kde2d (containing two)
 #' vectors and a matrix, named x, y and z) into a dataframe with columns
 #' x, y, z.
+#' @param u a list of 3 components:
+#'   x,y The x and y coordinates of the grid points, vectors of length n.
+#'   z An n[1] by n[2] matrix
 vmat2df <- function(u)
 {
   g = expand.grid(u$x, u$y)
@@ -239,24 +239,22 @@ vmat2df <- function(u)
 }
 
 #' Make a 2-d density plot of  xcol vs. ycol, using data from df.
-make.2d.density.plot <- function( df, xcol, ycol, prefix, output, device
-                                , use.color
-                                )
+#' @export
+make.2d.density.plot <- function(df, xcol, ycol, prefix, output, device, use.color)
 {
-  form <- as.formula(paste("l~", xcol, "+", ycol, sep=""))
-  df.summary <- summaryBy(form, data = df, FUN = sum)
+  form <- as.formula(paste("l~", xcol, "+", ycol, sep = ""))
+  df.summary <- doBy::summaryBy(form, data = df, FUN = sum)
   names(df.summary)[3] <- "l" # replace the ugly name given by summaryBy
 
   # Find the values of z which correspond to the given confidence levels.
   conf.levels = c(0.68, 0.95)
   zvals = find.contours(df.summary, conf.levels)
-  
+
   dev.fcn <- get(device)
-  filename <- file.path( output
-                       , paste(prefix, "_", xcol, "_", ycol, ".", device, sep=""))
+  filename <- file.path(output, paste(prefix, "_", xcol, "_", ycol, ".", device, sep = ""))
   levels <- c(0, zvals, 1)
   labels <- as.character(c(0, conf.levels, 1))
-  form <- as.formula(paste("l~", xcol, "*", ycol, sep=""))
+  form <- as.formula(paste("l~", xcol, "*", ycol, sep = ""))
   p <- contourplot( form, df.summary, at=levels, labels=labels
                   , panel=function(...){panel.grid(-1,-1); panel.contourplot(...)}
                   , xlab = xcol
@@ -275,6 +273,7 @@ make.2d.density.plot <- function( df, xcol, ycol, prefix, output, device
 #' Determine the values of z at which the 68% and 95% contour lines lie.
 #' Transform the matrix to a dataframe.
 #' Make the contour plot.
+#' @export
 make.2d.density.plots <- function(df, prefix, output, device, verbose, use.color)
 {
   if (verbose) cat("Making 2-d density plots\n")
@@ -293,30 +292,13 @@ make.2d.density.plots <- function(df, prefix, output, device, verbose, use.color
 
 }
 
-#' Create a dataframe from CosmoSIS output. We expect the first line of
-#' the output to contain the names of the parameters, separated by
-#' spaces, and with section names separated from parameter names by a
-#' double-hyphen.
-make.data.frame <- function(fname, burn)
-{
-  d <- read.table(fname)
-  # Remove the first 'burn' elements
-  d <- d[-c(1:burn),]
-  first <- readLines(fname, n=1)
-  first <- sub("#", "", first)          # Remove comment
-  parts <- strsplit(first, "\t")[[1]]   # split on tabs
-  cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
-  names(d) <- cols
-  likes <- exp(d$LIKE)
-  norm <- sum(likes)
-  d$l <- likes/norm
-  return(d)
-}
+
 
 #' Make a 1-d posterior density plot for each variable in the dataframe.
 #' We use bw="nrd", which gives a bandwidth calculation according to:
 #'    Scott, D. W. (1992) Multivariate Density Estimation: Theory, Practice, and
 #'    Visualization. Wiley.
+#' @export
 make.1d.post.density.plots <- function(dframe, prefix, output, device, verbose)
 {
   cols <- Filter(function(n) { ! n %in% c("l","LIKE") }, names(dframe))
@@ -365,6 +347,7 @@ vmat2df <- function(u)
 }
 
 #' Make a 2-d density plot of  xcol vs. ycol, using data from df.
+#' @export
 make.2d.density.plot <- function( df, xcol, ycol, prefix, output, device
                                 , use.color
 																, nbins)
@@ -382,10 +365,10 @@ make.2d.density.plot <- function( df, xcol, ycol, prefix, output, device
   # Find the values of z which correspond to the given confidence levels.
   conf.levels = c(0.68, 0.95)
   zvals = find.contours(kde, conf.levels)
-  
+
   # Convert from vectors+matrix to dataframe, to use lattice plotting.
   d <- vmat2df(kde)
-  
+
   dev.fcn <- get(device)
   filename <- file.path( output
                        , paste(prefix, "_", xcol, "_", ycol, ".", device, sep=""))
@@ -409,6 +392,7 @@ make.2d.density.plot <- function( df, xcol, ycol, prefix, output, device
 #' Determine the values of z at which the 68% and 95% contour lines lie.
 #' Transform the matrix to a dataframe.
 #' Make the contour plot.
+#' @export
 make.2d.density.plots <- function(df, prefix, output, device, verbose, use.color, nbins)
 {
   # Go through all pairs of interesting variables (all but 'LIKE' and 'l',
@@ -432,10 +416,11 @@ make.2d.density.plots <- function(df, prefix, output, device, verbose, use.color
 #'
 #' Returns a data.frame.
 #'
+#' @export
 load.cosmosis.timing.data <- function(fnames)
 {
-  drv <- dbDriver("SQLite")
-  on.exit(dbUnloadDriver(drv))
+  drv <- DBI::dbDriver("SQLite")
+  on.exit(DBI::dbUnloadDriver(drv))
   result <- Reduce(function(dframe, fname) {
                     newframe <- load.data.aux(drv,fname)
                     rbind(newframe, dframe)
@@ -450,9 +435,9 @@ load.cosmosis.timing.data <- function(fnames)
 
 load.data.aux <- function(driver, fname)
 {
-  con <- dbConnect(driver, fname)
-  on.exit(dbDisconnect(con))
-  tmp <- dbReadTable(con, "Samples")
+  con <- DBI::dbConnect(driver, fname)
+  on.exit(DBI::dbDisconnect(con))
+  tmp <- DBI::dbReadTable(con, "Samples")
   tmp$pid <- getPid(fname)
   tmp
 }

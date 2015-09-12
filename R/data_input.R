@@ -1,4 +1,3 @@
-library(tools)
 
 #-----------------------------------------------------------------------
 #' Read data from a CosmoSIS format linearized matrix sample file,
@@ -9,7 +8,7 @@ library(tools)
 #' @return The vector of values.
 cosmo.scan <- function(dirname, filename, quiet=TRUE)
 {
-  scan(file.path(dirname, filename), comment.char="#", quiet=quiet)
+  scan(file.path(dirname, filename), comment.char = "#", quiet = quiet)
 }
 
 #-----------------------------------------------------------------------
@@ -24,6 +23,7 @@ cosmo.scan <- function(dirname, filename, quiet=TRUE)
 #' "#" are ignored. The names of the columns are determined from the
 #' names of the files, by dropping the file extension.
 #'
+#' @export
 #' @param fnames A character vector containing the names of the files to be read.
 #' @return A CosmoSIS 'theory' dataframe.
 #
@@ -45,13 +45,14 @@ make.theory.dataframe <- function(fnames)
 #' It is assumed the file format is the CosmoSIS format for storing power
 #' spectra. Note this format is different from the format used for the storage
 #' of scalar parameters.
+#' @export
 #' @param dirname The name of the directory containing the CosmoSIS power spectrum output.
 #' @param type Any value; this value is replicated to fill the \code{type} column of the dataframe.
 #' @return A CosmoSIS matter power dataframe. If the directory does not exist, the returned dataframe will be empty.
 make.matterpower.dataframe <- function(dirname, type)
 {
   # If the directory does not exist, return an empty dataframe.
-  if (! file.exists(dirname)) return(data.frame())
+  if (!file.exists(dirname)) return(data.frame())
 
   # Scan each file, creating a vector of the right name
   # bind the columns into a dataframe.
@@ -67,8 +68,35 @@ make.matterpower.dataframe <- function(dirname, type)
   # ourselves.
   dframe <- data.frame( p_k = p_k
                       , k_h = k_h
-                      , z = rep(z, each=nkh)
+                      , z = rep(z, each = nkh)
                       )
   dframe$type = type
   dframe
 }
+
+#' Create a dataframe from CosmoSIS MCMC output. We expect the first line of
+#' the output to contain the names of the parameters, separated by
+#' spaces, and with section names separated from parameter names by a
+#' double-hyphen.
+#' @export
+#' @param fname The name of the file to be read.
+#' @param burn The length of the burn-in period; these samples are ignored in making the dataframe.
+#' @return a CosmoSIS MCMC dataframe. The columns are:
+#'   `l`
+make.data.frame <- function(fname, burn)
+{
+  d <- read.table(fname)
+  # Remove the first 'burn' elements
+  d <- d[-c(1:burn),]
+  first <- readLines(fname, n = 1)
+  first <- sub("#", "", first)           # Remove comment
+  parts <- strsplit(first, "\t")[[1]]    # split on tabs
+  cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
+  names(d) <- cols
+  likes <- exp(d$LIKE)
+  norm <- sum(likes)
+  d$l <- likes/norm
+  return(d)
+}
+
+#' Create a dataframe from CosmoSIS grid sampler output.
