@@ -1,0 +1,24 @@
+Package: rcosmosis
+Title: R functions to support CosmoSIS
+Version: 0.0.0.9000
+Authors@R: "Marc Paterno <paterno@fnal.gov> [aut, cre]"
+Description: rcosmosis provides functions useful in the analysis of the
+    output of CosmoSIS. CosmoSIS is a framework for structuring
+    cosmological parameter estimation in a way that eases re-usability,
+    debugging, verifiability, and code sharing in the form of modules
+    contained in repositories for individuals, collaborations, and the
+    community at large. CosmoSIS is available at
+    https://bitbucket.org/joezuntz/cosmosis.
+Requires: R (>= 3.2.0)
+Depends:
+    MASS,
+    RSQLite,
+    doBy,
+    lattice,
+    latticeExtra,
+    optparse
+License: BSD
+LazyData: true
+Suggests:
+    testthat
+URL: https://bitbucket.org/joezuntz/cosmosis.
