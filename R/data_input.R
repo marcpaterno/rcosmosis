@@ -66,12 +66,28 @@ make.matterpower.dataframe <- function(dirname, type)
   # and 'k_h' varying rapidly. Thus to build the dataframe, we can rely
   # on the recycling rule to get k_h correct, but have to construct z
   # ourselves.
-  dframe <- data.frame( p_k = p_k
-                      , k_h = k_h
-                      , z = rep(z, each = nkh)
-                      )
+  dframe <- data.frame(p_k = p_k,
+                       k_h = k_h,
+                       z = rep(z, each = nkh))
   dframe$type = type
   dframe
+}
+
+#' Extract the parameter names from a CosmoSIS sampler output file.
+#'
+#' The format of the first line of CosmoSIS grid and MCMC sample output carries
+#' the names of the parameters that were varied in that run of CosmoSIS. This
+#' function parses that line and returns the names of the parameters.
+#'
+#' @export
+#' @param txt The text to be parsed.
+#' @return A character vector containing the names of the parameters read from
+#'   the file.
+parse.cosmosis.parameters <- function(txt) {
+  tmp <- sub("#", "", txt)           # Remove comment
+  parts <- strsplit(tmp, "\t")[[1]]    # split on tabs
+  cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
+  sub("like", "loglike", cols, fixed = TRUE)
 }
 
 #' Create a data frame from CosmoSIS MCMC sampler output.
@@ -81,10 +97,13 @@ make.matterpower.dataframe <- function(dirname, type)
 #' each column in the file corresponds to a column in the data frame.
 #'
 #'
-#' The columns in a CosmoSIS MCMC data frame are: \describe{
-#' \item{loglike}{log-likelihood of the sample.} \item{like}{normalized
-#' likelihood of the sample.} \item{\emph{others}}{one column per sampled
-#' variable in the MCMC output, named as in the output.} }
+#' The columns in a CosmoSIS MCMC data frame are:
+#' \describe{
+#' \item{loglike}{log-likelihood of the sample.}
+#'  \item{like}{normalized likelihood of the sample.}
+#'  \item{\emph{others}}{one column per sampled variable in the MCMC
+#'   output, named as in the output.}
+#' }
 #'
 #' We expect the first line of the output to contain the names of the
 #' parameters, separated by spaces, and with section names separated from
@@ -101,17 +120,29 @@ read.cosmosis.mcmc <- function(fname, burn)
   # Remove the first 'burn' elements
   d <- d[-c(1:burn),]
   first <- readLines(fname, n = 1)
-  first <- sub("#", "", first)           # Remove comment
-  parts <- strsplit(first, "\t")[[1]]    # split on tabs
-  cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
-  cols <- sub("like", "loglike", cols, fixed = TRUE)
-  names(d) <- cols
-  likes <- exp(d$loglike)
-  norm <- sum(likes)
-  d$like <- likes/norm
+  names(d) <- parse.cosmosis.parameters(first)
+  d <- append.likelihoods(d)
   return(d)
 }
 
-#' Create a data frame from CosmoSIS grid sampler output.
+#' Read a CosmoSIS grid sampler output file.
 #'
-#' Reads a file in CosmoSIS grid sampler output format and creates a data frame from it.
+#' Reads a file in CosmoSIS grid sampler output format and returns a list
+#' describing the data.
+#' @export
+#' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
+#' @return A list of \code{n+1} components, where \code{n} is the number of
+#'   coordinate axes comprising the grid.
+#'
+#'   \describe{ \item{\code{x}, \code{y}}{The \code{x} and \code{y} coordinates
+#'   of the grid points, vectors of length \code{m} and \code{n}.}
+#'   \item{\code{z}}{An \code{m} by \code{n} matrix of log-likelihoods.} }
+read.cosmosis.grid <- function(fname)
+{
+  d <- read.table(fname)
+  first <- readLines(fname, n = 1)
+  names(d) <- parse.cosmosis.parameters(first)
+  d <- append.likelihoods(d)
+  cols2vmat(d)
+}
+

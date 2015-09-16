@@ -13,6 +13,11 @@ test_that("reading MCMC sampler output works", {
   expect_equal(sum(samples$like), 1.0)
 })
 
-test_that("reading grid sampler otput works", {
+test_that("reading grid sampler output works", {
   fname <- system.file("extdata", "grid-output-demo7.txt", package = "rcosmosis")
+
+  samples <- read.cosmosis.grid(fname)
+  expect_is(samples, "list")
+  #expect_identical(length(samples), as.integer(3))
+  #expect_identical(names(samples), c("omega_m", "sigma_8"))
 })
