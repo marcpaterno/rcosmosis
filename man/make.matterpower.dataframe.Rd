@@ -7,12 +7,15 @@
 make.matterpower.dataframe(dirname, type)
 }
 \arguments{
-\item{dirname}{The name of the directory containing the CosmoSIS power spectrum output.}
+\item{dirname}{The name of the directory containing the CosmoSIS power
+spectrum output.}
 
-\item{type}{Any value; this value is replicated to fill the \code{type} column of the dataframe.}
+\item{type}{Any value; this value is replicated to fill the \code{type}
+column of the dataframe.}
 }
 \value{
-A CosmoSIS matter power dataframe. If the directory does not exist, the returned dataframe will be empty.
+A CosmoSIS matter power dataframe. If the directory does not exist,
+  the returned dataframe will be empty.
 }
 \description{
 It is assumed the file format is the CosmoSIS format for storing power

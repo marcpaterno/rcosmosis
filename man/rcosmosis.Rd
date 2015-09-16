@@ -12,7 +12,8 @@ that output.
 }
 \section{Functions for reading data}{
 
-\code
+\code{read.cosmosis.mcmc}, for reading MCMC sampler output.
+\code{read.cosmosis.grid}, for reading grid sampler output.
 }
 
 \section{Functions for plotting data}{

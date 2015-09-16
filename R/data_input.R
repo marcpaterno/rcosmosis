@@ -46,9 +46,12 @@ make.theory.dataframe <- function(fnames)
 #' spectra. Note this format is different from the format used for the storage
 #' of scalar parameters.
 #' @export
-#' @param dirname The name of the directory containing the CosmoSIS power spectrum output.
-#' @param type Any value; this value is replicated to fill the \code{type} column of the dataframe.
-#' @return A CosmoSIS matter power dataframe. If the directory does not exist, the returned dataframe will be empty.
+#' @param dirname The name of the directory containing the CosmoSIS power
+#'   spectrum output.
+#' @param type Any value; this value is replicated to fill the \code{type}
+#'   column of the dataframe.
+#' @return A CosmoSIS matter power dataframe. If the directory does not exist,
+#'   the returned dataframe will be empty.
 make.matterpower.dataframe <- function(dirname, type)
 {
   # If the directory does not exist, return an empty dataframe.
