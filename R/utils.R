@@ -25,7 +25,7 @@ cols2vmat <- function(d) {
 #'
 #' @param d A data.frame containing a column of log-likelihoods named loglike.
 #' @return The augmented data.frame.
-append.likelihoods <- function (d) {
+append.likelihoods <- function(d) {
   likes <- exp(d$loglike)
   norm <- sum(likes)
   d$like <- likes/norm

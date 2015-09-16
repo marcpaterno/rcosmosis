@@ -33,7 +33,7 @@ cosmo.scan <- function(dirname, filename, quiet=TRUE)
 make.theory.dataframe <- function(fnames)
 {
   # Scan each file, creating a vector of the right name
-  columns <- lapply(fnames, function(n) scan(n, comment.char="#", quiet=TRUE))
+  columns <- lapply(fnames, function(n) scan(n, comment.char = "#", quiet = TRUE))
   result <- data.frame(columns)
   names(result) <- lapply(fnames, function(n) tools::file_path_sans_ext(basename(n)))
   result
