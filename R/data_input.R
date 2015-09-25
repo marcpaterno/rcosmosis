@@ -148,4 +148,3 @@ read.cosmosis.grid <- function(fname)
   d <- append.likelihoods(d)
   cols2vmat(d)
 }
-
