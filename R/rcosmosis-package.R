@@ -13,6 +13,4 @@
 #'
 #' @docType package
 #' @name rcosmosis
-#'
-#' @import lattice
 NULL
