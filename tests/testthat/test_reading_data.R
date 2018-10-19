@@ -25,6 +25,19 @@ test_that("reading MCMC sampler output works", {
   expect_equal(sum(samples$like), 1.0)
 })
 
+test_that("reading EMCEE sampler output works", {
+  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+
+  samples <- emcee.read(fname, 64)
+  expect_is(samples, "data.frame")
+  expect_identical(nrow(samples), as.integer(25600))
+  expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like", "walker", "n"))
+  # All the columns in samples must be numeric
+  expect_equal(sum(samples$like), 1.0)
+  expect_equal(max(samples$n), 400)
+  expect_equal(max(samples$walker), 64)
+})
+
 test_that("reading grid sampler output works", {
   fname <- system.file("extdata", "grid-output-demo7.txt", package = "rcosmosis")
 

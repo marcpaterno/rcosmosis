@@ -4,16 +4,17 @@
 \alias{read.cosmosis.mcmc}
 \title{Create a data frame from CosmoSIS MCMC sampler output.}
 \usage{
-read.cosmosis.mcmc(fname, burn)
+read.cosmosis.mcmc(fname, burn = 0)
 }
 \arguments{
-\item{fname}{The name of the CosmoSIS MCMC sampler output file to be read.}
+\item{fname}{The name of the CosmoSIS MCMC sampler output file to be read.
+making the data frame}
 
 \item{burn}{The length of the burn-in period; these samples are ignored in
 making the data frame.}
 }
 \value{
-a CosmoSIS MCMC data frame.
+a CosmoSIS MCMC data frame
 }
 \description{
 Reads a file in CosmoSIS MCMC sampler output format and creates a data frame

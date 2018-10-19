@@ -113,18 +113,38 @@ parse.cosmosis.parameters <- function(txt) {
 #'
 #' @export
 #' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
+#'   making the data frame
 #' @param burn The length of the burn-in period; these samples are ignored in
 #'   making the data frame.
-#' @return a CosmoSIS MCMC data frame.
+#' @return a CosmoSIS MCMC data frame
 read.cosmosis.mcmc <- function(fname, burn = 0)
 {
-  d <- read.table(fname)
-  # Remove the first 'burn' elements
-  d <- d[-c(1:burn),]
+  checkmate::assert_count(burn)
+  d <- utils::read.table(fname)
+  if (burn>0) d <- d[-c(1:burn),]
   first <- readLines(fname, n = 1)
   names(d) <- parse.cosmosis.parameters(first)
   d <- append.likelihoods(d)
-  return(d)
+  d
+}
+
+#' emcee.read
+#'
+#' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
+#'   making the data frame
+#' @param num.walkers The number of walkers used.
+#'
+#' @return a CosmoSIS MCMC dataframe
+#' @export
+#'
+emcee.read <- function(fname, num.walkers)
+{
+  checkmate::assert_count(num.walkers)
+  x <- read.cosmosis.mcmc(fname)
+  x$walker = 1 : num.walkers
+  nsamples <- nrow(x)/num.walkers
+  x$n <- rep(1:(nsamples), each = num.walkers)
+  x
 }
 
 #' Read a CosmoSIS grid sampler output file.
@@ -141,7 +161,7 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
 #'   \item{\code{z}}{An \code{m} by \code{n} matrix of log-likelihoods.} }
 read.cosmosis.grid <- function(fname)
 {
-  d <- read.table(fname)
+  d <- utils::read.table(fname)
   first <- readLines(fname, n = 1)
   names(d) <- parse.cosmosis.parameters(first)
   d <- append.likelihoods(d)
