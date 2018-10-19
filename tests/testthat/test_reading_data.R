@@ -1,6 +1,18 @@
 library(rcosmosis)
 context("Reading CosmoSIS files")
 
+test_that("parsing parameter names from pre-fcc1161b sampler files works", {
+  text <- "#cosmological_parameters--omega_m	cosmological_parameters--h0	supernova_params--deltam	supernova_params--alpha	supernova_params--beta	like"
+  res <- parse.cosmosis.parameters(text)
+  expect_identical(res, c("omega_m", "h0", "deltam", "alpha", "beta", "loglike"))
+})
+
+test_that("parsing parameter names from post-fcc1161b sampler files works", {
+  text <- "#cosmological_parameters--omega_m	post"
+  res <- parse.cosmosis.parameters(text)
+  expect_identical(res, c("omega_m", "loglike"))
+})
+
 test_that("reading MCMC sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
 

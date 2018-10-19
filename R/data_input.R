@@ -82,7 +82,6 @@ make.matterpower.dataframe <- function(dirname, type)
 #' the names of the parameters that were varied in that run of CosmoSIS. This
 #' function parses that line and returns the names of the parameters.
 #'
-#' @export
 #' @param txt The text to be parsed.
 #' @return A character vector containing the names of the parameters read from
 #'   the file.
@@ -90,7 +89,7 @@ parse.cosmosis.parameters <- function(txt) {
   tmp <- sub("#", "", txt)           # Remove comment
   parts <- strsplit(tmp, "\t")[[1]]    # split on tabs
   cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
-  sub("like", "loglike", cols, fixed = TRUE)
+  sub("(like)|(post)", "loglike", cols, fixed = FALSE)
 }
 
 #' Create a data frame from CosmoSIS MCMC sampler output.
@@ -117,7 +116,7 @@ parse.cosmosis.parameters <- function(txt) {
 #' @param burn The length of the burn-in period; these samples are ignored in
 #'   making the data frame.
 #' @return a CosmoSIS MCMC data frame.
-read.cosmosis.mcmc <- function(fname, burn)
+read.cosmosis.mcmc <- function(fname, burn = 0)
 {
   d <- read.table(fname)
   # Remove the first 'burn' elements

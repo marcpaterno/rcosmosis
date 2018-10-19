@@ -19,8 +19,8 @@ test_that("transforming data.frame to vector/matrix form works", {
   expect_is(res$like, "array")
 })
 
-test_that("transforming vector/matrix to data.frame works", {
-  vm <- list(a=1:4, b=1:3, c=1:5)
-  num.elements <- prod(sapply(vm, FUN=length))
-
-})
+# test_that("transforming vector/matrix to data.frame works", {
+#   vm <- list(a=1:4, b=1:3, c=1:5)
+#   num.elements <- prod(sapply(vm, FUN=length))
+#
+# })
