@@ -13,6 +13,11 @@ test_that("parsing parameter names from post-fcc1161b sampler files works", {
   expect_identical(res, c("omega_m", "loglike"))
 })
 
+test_that("parsing number of walkers from EMCEE output works", {
+  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+  nwalkers <- emcee.count.walkers()
+})
+
 test_that("reading MCMC sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
 
@@ -28,7 +33,7 @@ test_that("reading MCMC sampler output works", {
 test_that("reading EMCEE sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
 
-  samples <- emcee.read(fname, 64)
+  samples <- emcee.read(fname)
   expect_is(samples, "data.frame")
   expect_identical(nrow(samples), as.integer(25600))
   expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like", "walker", "n"))

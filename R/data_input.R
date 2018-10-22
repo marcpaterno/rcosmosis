@@ -76,6 +76,7 @@ make.matterpower.dataframe <- function(dirname, type)
   dframe
 }
 
+#-----------------------------------------------------------------------
 #' Extract the parameter names from a CosmoSIS sampler output file.
 #'
 #' The format of the first line of CosmoSIS grid and MCMC sample output carries
@@ -92,6 +93,14 @@ parse.cosmosis.parameters <- function(txt) {
   sub("(like)|(post)", "loglike", cols, fixed = FALSE)
 }
 
+#-----------------------------------------------------------------------
+parse.emcee.wakers <- function(txt) {
+  matches <- string::str_match(txt, "^#walkers=(\\d+)$")[,2] %>% stats::na.omit
+  stopifnot(length(matches) == 1)
+  as.integer(maches)
+}
+
+#-----------------------------------------------------------------------
 #' Create a data frame from CosmoSIS MCMC sampler output.
 #'
 #' Reads a file in CosmoSIS MCMC sampler output format and creates a data frame
@@ -128,6 +137,7 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
   d
 }
 
+#-----------------------------------------------------------------------
 #' emcee.read
 #'
 #' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
@@ -147,6 +157,7 @@ emcee.read <- function(fname, num.walkers)
   x
 }
 
+#-----------------------------------------------------------------------
 #' Read a CosmoSIS grid sampler output file.
 #'
 #' Reads a file in CosmoSIS grid sampler output format and returns a list
