@@ -15,7 +15,9 @@ test_that("parsing parameter names from post-fcc1161b sampler files works", {
 
 test_that("parsing number of walkers from EMCEE output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
-  nwalkers <- emcee.count.walkers()
+  txt <- readLines(fname, n = 100)
+  nwalkers <- emcee.count.walkers(txt)
+  expect_identical(nwalkers, 64L)
 })
 
 test_that("reading MCMC sampler output works", {

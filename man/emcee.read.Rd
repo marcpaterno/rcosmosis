@@ -4,7 +4,7 @@
 \alias{emcee.read}
 \title{emcee.read}
 \usage{
-emcee.read(fname, num.walkers)
+emcee.read(fname)
 }
 \arguments{
 \item{fname}{The name of the CosmoSIS MCMC sampler output file to be read.

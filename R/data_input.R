@@ -1,5 +1,3 @@
-
-#-----------------------------------------------------------------------
 #' Read data from a CosmoSIS format linearized matrix sample file,
 #' e.g. a power spectrum file.
 #' @param dirname The name of the directory from which we read.
@@ -11,7 +9,6 @@ cosmo.scan <- function(dirname, filename, quiet=TRUE)
   scan(file.path(dirname, filename), comment.char = "#", quiet = quiet)
 }
 
-#-----------------------------------------------------------------------
 #' Create a CosmoSIS 'theory' dataframe from all the named files.
 #'
 #'
@@ -39,7 +36,6 @@ make.theory.dataframe <- function(fnames)
   result
 }
 
-#-----------------------------------------------------------------------
 #' Create a CosmoSIS matter power dataframe from all the named files.
 #'
 #' It is assumed the file format is the CosmoSIS format for storing power
@@ -76,7 +72,6 @@ make.matterpower.dataframe <- function(dirname, type)
   dframe
 }
 
-#-----------------------------------------------------------------------
 #' Extract the parameter names from a CosmoSIS sampler output file.
 #'
 #' The format of the first line of CosmoSIS grid and MCMC sample output carries
@@ -93,14 +88,6 @@ parse.cosmosis.parameters <- function(txt) {
   sub("(like)|(post)", "loglike", cols, fixed = FALSE)
 }
 
-#-----------------------------------------------------------------------
-parse.emcee.wakers <- function(txt) {
-  matches <- string::str_match(txt, "^#walkers=(\\d+)$")[,2] %>% stats::na.omit
-  stopifnot(length(matches) == 1)
-  as.integer(maches)
-}
-
-#-----------------------------------------------------------------------
 #' Create a data frame from CosmoSIS MCMC sampler output.
 #'
 #' Reads a file in CosmoSIS MCMC sampler output format and creates a data frame
@@ -137,7 +124,6 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
   d
 }
 
-#-----------------------------------------------------------------------
 #' emcee.read
 #'
 #' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
@@ -147,9 +133,9 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
 #' @return a CosmoSIS MCMC dataframe
 #' @export
 #'
-emcee.read <- function(fname, num.walkers)
+emcee.read <- function(fname)
 {
-  checkmate::assert_count(num.walkers)
+  num.walkers <- emcee.count.walkers(readLines(fname, 100))
   x <- read.cosmosis.mcmc(fname)
   x$walker = 1 : num.walkers
   nsamples <- nrow(x)/num.walkers
@@ -157,7 +143,6 @@ emcee.read <- function(fname, num.walkers)
   x
 }
 
-#-----------------------------------------------------------------------
 #' Read a CosmoSIS grid sampler output file.
 #'
 #' Reads a file in CosmoSIS grid sampler output format and returns a list
@@ -177,4 +162,17 @@ read.cosmosis.grid <- function(fname)
   names(d) <- parse.cosmosis.parameters(first)
   d <- append.likelihoods(d)
   cols2vmat(d)
+}
+
+#' emcee.count.walkers Return the number of walkers used for this EMCEE run.
+#'
+#' @param txt Starting lines from the EMCEE output file
+#'
+#' @return The number of walkers
+#' @export
+#'
+emcee.count.walkers <- function(txt) {
+  matches <- stats::na.omit(stringr::str_match(txt, "^#walkers=(\\d+)$")[,2])
+  stopifnot(length(matches) == 1)
+  as.integer(matches)
 }
