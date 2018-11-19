@@ -1,6 +1,13 @@
 library(rcosmosis)
 context("CosmoSIS internal utilities")
 
+test_that("append.likelihoods works", {
+  x <- data.frame(x = 1:5, loglike = exp(-(1:5)))
+  y <- append.likelihoods(x)
+  expect_identical(names(y), c("x","loglike", "like"))
+  expect_equal(sum(y$like), 1.0)
+})
+
 test_that("transforming data.frame to vector/matrix form works", {
   df <- data.frame(x = rep(11:14, each = 4, rep = 2),
                    y = rep(1:2, each = 2, rep = 8),
