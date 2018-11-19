@@ -47,9 +47,10 @@ test_that("reading EMCEE sampler output works", {
 
 test_that("reading grid sampler output works", {
   fname <- system.file("extdata", "grid-output-demo7.txt", package = "rcosmosis")
-
   samples <- read.cosmosis.grid(fname)
+  # read.cosmosis.grid returns a list, not a data.frame.
+  # TODO: Reconsider this design choice.
   expect_type(samples, "list")
   expect_identical(length(samples), as.integer(3))
-  expect_identical(names(samples), c("omega_m", "sigma_8", "loglike"))
+  expect_identical(names(samples), c("omega_m", "sigma_8", "like"))
 })
