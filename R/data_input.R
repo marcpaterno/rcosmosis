@@ -83,7 +83,7 @@ make.matterpower.dataframe <- function(dirname, type)
 #'   the file.
 parse.cosmosis.parameters <- function(txt) {
   tmp <- sub("#", "", txt)           # Remove comment
-  parts <- strsplit(tmp, "\t")[[1]]    # split on tabs
+  parts <- stringr::str_split(tmp, "\t")[[1]]    # split on tabs
   cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
   sub("(like)|(post)", "loglike", cols, fixed = FALSE)
 }
