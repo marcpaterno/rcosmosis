@@ -116,12 +116,12 @@ parse.cosmosis.parameters <- function(txt) {
 read.cosmosis.mcmc <- function(fname, burn = 0)
 {
   checkmate::assert_count(burn)
-  d <- utils::read.table(fname)
+  d <- utils::read.table(fname, as.is = TRUE)
   if (burn>0) d <- d[-c(1:burn),]
   first <- readLines(fname, n = 1)
   names(d) <- parse.cosmosis.parameters(first)
   d <- append.likelihoods(d)
-  d
+  tibble::as_tibble(d)
 }
 
 #' emcee.read

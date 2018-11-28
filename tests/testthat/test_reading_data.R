@@ -24,7 +24,7 @@ test_that("reading MCMC sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
 
   samples <- read.cosmosis.mcmc(fname, 5600)
-  expect_s3_class(samples, "data.frame")
+  expect_s3_class(samples, "tbl_df")
   expect_identical(nrow(samples), as.integer(20*1000))
   expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like"))
   # All the columns in samples must be numeric
@@ -36,7 +36,7 @@ test_that("reading EMCEE sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
 
   samples <- emcee.read(fname)
-  expect_s3_class(samples, "data.frame")
+  expect_s3_class(samples, "tbl_df")
   expect_identical(nrow(samples), as.integer(25600))
   expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like", "walker", "n"))
   # All the columns in samples must be numeric
@@ -54,3 +54,6 @@ test_that("reading grid sampler output works", {
   expect_identical(length(samples), as.integer(3))
   expect_identical(names(samples), c("omega_m", "sigma_8", "like"))
 })
+
+
+
