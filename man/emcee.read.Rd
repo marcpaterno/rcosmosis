@@ -9,8 +9,6 @@ emcee.read(fname)
 \arguments{
 \item{fname}{The name of the CosmoSIS MCMC sampler output file to be read.
 making the data frame}
-
-\item{num.walkers}{The number of walkers used.}
 }
 \value{
 a CosmoSIS MCMC dataframe

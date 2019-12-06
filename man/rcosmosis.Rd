@@ -3,7 +3,6 @@
 \docType{package}
 \name{rcosmosis}
 \alias{rcosmosis}
-\alias{rcosmosis-package}
 \title{rcosmosis: A package for analysis of CosmoSIS output.}
 \description{
 The rcosmosis package provides functions for reading CosmoSIS output (MCMC

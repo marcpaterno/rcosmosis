@@ -4,8 +4,14 @@
 \alias{emcee.convergence.plot}
 \title{Title emcee.convergence.plot}
 \usage{
-emcee.convergence.plot(x, panels = TRUE, numbers = FALSE, nmin = 1,
-  nmax = max(x$n), walkers = 1:max(x$walker))
+emcee.convergence.plot(
+  x,
+  panels = TRUE,
+  numbers = FALSE,
+  nmin = 1,
+  nmax = max(x$n),
+  walkers = 1:max(x$walker)
+)
 }
 \arguments{
 \item{x}{: a dataframe made from emcee sampler output}

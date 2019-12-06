@@ -128,7 +128,6 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
 #'
 #' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
 #'   making the data frame
-#' @param num.walkers The number of walkers used.
 #'
 #' @return a CosmoSIS MCMC dataframe
 #' @export
@@ -164,6 +163,36 @@ read.cosmosis.grid <- function(fname)
   cols2vmat(d)
 }
 
+#' read.metropolis.hasting
+#'
+#' @param fileglob The glob pattern (as used by Sys.glob) specifiying the CosmoSIS
+#' Metropolis-Hastings sampler output file to be read.
+#'
+#' @return a CosmoSIS MCMC dataframe
+#' @export
+#'
+read.metropolis.hastings <- function(fileglob)
+{
+  expect_scalar(fileglob)
+  expect_string(fileglob)
+  tmp <- getwd()
+  # Determine files to be read.
+  fnames = Sys.glob(fileglob)
+  stopifnot(length(fnames) > 0)
+  # Read all files into list of dataframes.
+  tbls <- lapply(fnames, read.cosmosis.mcmc)
+  # Augment each dataframe with the chain number, and the sample numbers
+  chain_ids <- as.list(1:length(tbls))
+  tbls_and_chain_ids <- rlist::list.zip(df = tbls, chain = chain_ids)
+  tbls <- lapply(tbls_and_chain_ids,
+                 function(x) {
+                   ntmp <- nrow(x$df)
+                   x$df %>% mutate(chain = x$chain, sample = 1:ntmp)
+                   })
+  # Combine into one dataframe
+  bind_rows(tbls)
+}
+
 #' emcee.count.walkers Return the number of walkers used for this EMCEE run.
 #'
 #' @param txt Starting lines from the EMCEE output file
@@ -175,4 +204,17 @@ emcee.count.walkers <- function(txt) {
   matches <- stats::na.omit(stringr::str_match(txt, "^#walkers=(\\d+)$")[,2])
   stopifnot(length(matches) == 1)
   as.integer(matches)
+}
+
+#' mcmc.list.from.emcee
+#'
+#' @param tbl An emcee data.frame, as created by emcee.read
+#'
+#' @return an mcmc.list object
+#' @export
+#'
+mcmc.list.from.emcee <- function(tbl)
+{
+  lst <- select(tbl, -c(loglike, like)) %>% group_by(walker) %>% group_split(keep = FALSE)
+  coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
