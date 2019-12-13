@@ -73,3 +73,12 @@ test_that("reading MH chains works", {
   expect_equal(nrow(samples), 32*1000)
 })
 
+test_that("conversion of MH chains to mcmc.list works", {
+  dirname <- system.file("extdata", "run20", package = "rcosmosis")
+  fglob <- file.path(dirname, "chain_metro_20_*.txt")
+  samples <- read.metropolis.hastings(fglob)
+  ml <- mcmc.list.from.metropolis.hastings(samples)
+  expect_s3_class(ml, "mcmc.list")
+  expect_identical(length(ml), max(samples$chain))
+})
+

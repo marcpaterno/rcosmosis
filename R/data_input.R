@@ -218,3 +218,11 @@ mcmc.list.from.emcee <- function(tbl)
   lst <- select(tbl, -c(loglike, like)) %>% group_by(walker) %>% group_split(keep = FALSE)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
+
+mcmc.list.from.metropolis.hastings <- function(tbl)
+{
+  lst <- select(tbl, -c(loglike, like, sample)) %>%
+         group_by(chain) %>%
+         group_split(keep = FALSE)
+  coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
+}
