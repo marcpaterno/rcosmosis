@@ -20,7 +20,7 @@ emcee.convergence.plot <-
            nmax = max(x$n),
            walkers = 1 : max(x$walker))
   {
-    nrange = nmax - nmin
+    nrange = nmax - nmin + 1
     data <- filter(x
                    , walker %in% walkers
                    , nmin <= n
