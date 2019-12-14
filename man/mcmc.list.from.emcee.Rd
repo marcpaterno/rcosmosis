@@ -7,7 +7,7 @@
 mcmc.list.from.emcee(tbl)
 }
 \arguments{
-\item{tbl}{An emcee data.frame, as created by emcee.read}
+\item{tbl}{An emcee data.frame, as created by read.emcee}
 }
 \value{
 an mcmc.list object

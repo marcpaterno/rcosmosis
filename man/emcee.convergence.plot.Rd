@@ -9,7 +9,7 @@ emcee.convergence.plot(
   panels = TRUE,
   numbers = FALSE,
   nmin = 1,
-  nmax = max(x$n),
+  nmax = max(x$sample),
   walkers = 1:max(x$walker)
 )
 }

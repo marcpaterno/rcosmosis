@@ -34,13 +34,13 @@ test_that("reading MCMC sampler output works", {
 
 test_that("reading EMCEE sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
-  samples <- emcee.read(fname)
+  samples <- read.emcee(fname)
   expect_s3_class(samples, "tbl_df")
   expect_identical(nrow(samples), as.integer(25600))
-  expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like", "walker", "n"))
+  expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like", "walker", "sample"))
   # All the columns in samples must be numeric
   expect_equal(sum(samples$like), 1.0)
-  expect_equal(max(samples$n), 400)
+  expect_equal(max(samples$sample), 400)
   expect_equal(max(samples$walker), 64)
 })
 
@@ -56,21 +56,24 @@ test_that("reading grid sampler output works", {
 
 test_that("conversion of EMCEE to mcmc.list works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
-  samples <- emcee.read(fname)
+  samples <- read.emcee(fname)
   ml <- mcmc.list.from.emcee(samples)
   expect_s3_class(ml, "mcmc.list")
   expect_identical(length(ml), max(samples$walker))
 })
 
-test_that("reading MH chains works", {
+get_mh_fileglob <- function() {
   dirname <- system.file("extdata", "run20", package = "rcosmosis")
   filenames <- dir(dirname, "chain_metro_20_.*\\.txt")
   expect_equal(length(filenames), 32)
   fglob <- file.path(dirname, "chain_metro_20_*.txt")
-  samples <- read.metropolis.hastings(fglob)
-  #samples <- read.metropolis.hastings("../../inst/extdata/run20/chain_metro_20_*.txt")
-  expect_identical(names(samples), c("omega_m", "sigma8_input", "concentration", "prior", "loglike", "like", "chain", "sample"))
-  expect_equal(nrow(samples), 32*1000)
+}
+
+test_that("reading MH chains works", {
+
+  samples <- read.metropolis.hastings(get_mh_fileglob())
+  testthat::expect_identical(names(samples), c("omega_m", "sigma8_input", "concentration", "prior", "loglike", "like", "chain", "sample"))
+  testthat::expect_equal(nrow(samples), 32*1000)
 })
 
 test_that("conversion of MH chains to mcmc.list works", {
@@ -79,6 +82,20 @@ test_that("conversion of MH chains to mcmc.list works", {
   samples <- read.metropolis.hastings(fglob)
   ml <- mcmc.list.from.metropolis.hastings(samples)
   expect_s3_class(ml, "mcmc.list")
-  expect_identical(length(ml), max(samples$chain))
+  expect_equal(length(ml), max(samples$chain))
 })
 
+test_that("remove.burnin removes samples from each chain for MH", {
+ samples <- read.metropolis.hastings(get_mh_fileglob())
+ expect_equal(min(samples$sample), 1)
+ good_samples <- remove.burnin(samples, 500)
+ expect_equal(min(good_samples$sample), 501)
+})
+
+test_that("remove.burnin removes samples from each walker for emcee", {
+  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+  samples <- read.emcee(fname)
+  expect_equal(min(samples$sample), 1)
+  good_samples <- remove.burnin(samples, 123)
+  expect_equal(min(good_samples$sample), 124)
+})

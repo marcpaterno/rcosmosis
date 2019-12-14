@@ -124,7 +124,7 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
   tibble::as_tibble(d)
 }
 
-#' emcee.read
+#' read.emcee
 #'
 #' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
 #'   making the data frame
@@ -132,13 +132,13 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
 #' @return a CosmoSIS MCMC dataframe
 #' @export
 #'
-emcee.read <- function(fname)
+read.emcee <- function(fname)
 {
   num.walkers <- emcee.count.walkers(readLines(fname, 100))
   x <- read.cosmosis.mcmc(fname)
   x$walker = 1 : num.walkers
   nsamples <- nrow(x)/num.walkers
-  x$n <- rep(1:(nsamples), each = num.walkers)
+  x$sample <- rep(1:(nsamples), each = num.walkers)
   x
 }
 
@@ -173,8 +173,8 @@ read.cosmosis.grid <- function(fname)
 #'
 read.metropolis.hastings <- function(fileglob)
 {
-  expect_scalar(fileglob)
-  expect_string(fileglob)
+  checkmate::expect_scalar(fileglob)
+  checkmate::expect_string(fileglob)
   tmp <- getwd()
   # Determine files to be read.
   fnames = Sys.glob(fileglob)
@@ -187,10 +187,10 @@ read.metropolis.hastings <- function(fileglob)
   tbls <- lapply(tbls_and_chain_ids,
                  function(x) {
                    ntmp <- nrow(x$df)
-                   x$df %>% mutate(chain = x$chain, sample = 1:ntmp)
+                   x$df %>% dplyr::mutate(chain = x$chain, sample = 1:ntmp)
                    })
   # Combine into one dataframe
-  bind_rows(tbls)
+  dplyr::bind_rows(tbls)
 }
 
 #' emcee.count.walkers Return the number of walkers used for this EMCEE run.
@@ -208,21 +208,38 @@ emcee.count.walkers <- function(txt) {
 
 #' mcmc.list.from.emcee
 #'
-#' @param tbl An emcee data.frame, as created by emcee.read
+#' @param tbl An emcee data.frame, as created by read.emcee
 #'
 #' @return an mcmc.list object
 #' @export
+#' @importFrom magrittr `%>%`
 #'
 mcmc.list.from.emcee <- function(tbl)
 {
-  lst <- select(tbl, -c(loglike, like)) %>% group_by(walker) %>% group_split(keep = FALSE)
+  lst <- dplyr::select(tbl, -c(.data$loglike, .data$like)) %>%
+         dplyr::group_by(.data$walker) %>%
+         dplyr::group_split(keep = FALSE)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
 
 mcmc.list.from.metropolis.hastings <- function(tbl)
 {
-  lst <- select(tbl, -c(loglike, like, sample)) %>%
-         group_by(chain) %>%
-         group_split(keep = FALSE)
+  lst <- dplyr::select(tbl, -c(.data$loglike, .data$like, .data$sample)) %>%
+         dplyr::group_by(.data$chain) %>%
+         dplyr::group_split(keep = FALSE)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
+}
+
+#' remove.burnin
+#'
+#' @param x : a emcee or MH dataframe
+#' @param n : the number of samples to remove (from each walker or chain)
+#'
+#' @return a copy of the input x, with n samples removed
+#' @export
+#'
+remove.burnin <- function(x, n)
+{
+  checkmate::expect_scalar(n)
+  dplyr::filter(x, .data$sample > n)
 }
