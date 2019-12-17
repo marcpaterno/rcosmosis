@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_input.R
 \name{read.metropolis.hastings}
 \alias{read.metropolis.hastings}
-\title{read.metropolis.hasting}
+\title{read.metropolis.hastings}
 \usage{
 read.metropolis.hastings(fileglob)
 }
@@ -14,5 +14,5 @@ Metropolis-Hastings sampler output file to be read.}
 a CosmoSIS MCMC dataframe
 }
 \description{
-read.metropolis.hasting
+read.metropolis.hastings
 }

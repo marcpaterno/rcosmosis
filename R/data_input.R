@@ -163,13 +163,14 @@ read.cosmosis.grid <- function(fname)
   cols2vmat(d)
 }
 
-#' read.metropolis.hasting
+#' read.metropolis.hastings
 #'
 #' @param fileglob The glob pattern (as used by Sys.glob) specifiying the CosmoSIS
 #' Metropolis-Hastings sampler output file to be read.
 #'
 #' @return a CosmoSIS MCMC dataframe
 #' @export
+#' @importFrom magrittr `%>%`
 #'
 read.metropolis.hastings <- function(fileglob)
 {
