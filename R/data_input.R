@@ -126,11 +126,11 @@ read.cosmosis.mcmc <- function(fname, burn = 0)
 
 #' read.emcee
 #'
+#' @export
 #' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
 #'   making the data frame
 #'
 #' @return a CosmoSIS MCMC dataframe
-#' @export
 #'
 read.emcee <- function(fname)
 {
@@ -165,11 +165,11 @@ read.cosmosis.grid <- function(fname)
 
 #' read.metropolis.hastings
 #'
+#' @export
 #' @param fileglob The glob pattern (as used by Sys.glob) specifiying the CosmoSIS
 #' Metropolis-Hastings sampler output file to be read.
 #'
 #' @return a CosmoSIS MCMC dataframe
-#' @export
 #' @importFrom magrittr `%>%`
 #'
 read.metropolis.hastings <- function(fileglob)
@@ -196,10 +196,10 @@ read.metropolis.hastings <- function(fileglob)
 
 #' emcee.count.walkers Return the number of walkers used for this EMCEE run.
 #'
+#' @export
 #' @param txt Starting lines from the EMCEE output file
 #'
 #' @return The number of walkers
-#' @export
 #'
 emcee.count.walkers <- function(txt) {
   matches <- stats::na.omit(stringr::str_match(txt, "^#walkers=(\\d+)$")[,2])
@@ -208,11 +208,11 @@ emcee.count.walkers <- function(txt) {
 }
 
 #' mcmc.list.from.emcee
-#'
+#
+#' @export
 #' @param tbl An emcee data.frame, as created by read.emcee
 #'
 #' @return an mcmc.list object
-#' @export
 #' @importFrom magrittr `%>%`
 #'
 mcmc.list.from.emcee <- function(tbl)
@@ -223,6 +223,13 @@ mcmc.list.from.emcee <- function(tbl)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
 
+#' mcmc.list.from.metropolis.hastings
+#'
+#' @param tbl A MH data.frame, as created by read.metropolis.hastings
+#'
+#' @return an mcmc.list object
+#' @export
+#'
 mcmc.list.from.metropolis.hastings <- function(tbl)
 {
   lst <- dplyr::select(tbl, -c(.data$loglike, .data$like, .data$sample)) %>%
@@ -233,11 +240,11 @@ mcmc.list.from.metropolis.hastings <- function(tbl)
 
 #' remove.burnin
 #'
+#' @export
 #' @param x : a emcee or MH dataframe
 #' @param n : the number of samples to remove (from each walker or chain)
 #'
 #' @return a copy of the input x, with n samples removed
-#' @export
 #'
 remove.burnin <- function(x, n)
 {
