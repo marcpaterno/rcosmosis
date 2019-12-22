@@ -14,14 +14,14 @@ test_that("parsing parameter names from post-fcc1161b sampler files works", {
 })
 
 test_that("parsing number of walkers from EMCEE output works", {
-  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+  fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
   txt <- readLines(fname, n = 100)
   nwalkers <- emcee.count.walkers(txt)
   expect_identical(nwalkers, 64L)
 })
 
 test_that("reading MCMC sampler output works", {
-  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+  fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
 
   samples <- read.cosmosis.mcmc(fname, 5600)
   expect_s3_class(samples, "tbl_df")
@@ -33,7 +33,7 @@ test_that("reading MCMC sampler output works", {
 })
 
 test_that("reading EMCEE sampler output works", {
-  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+  fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
   samples <- read.emcee(fname)
   expect_s3_class(samples, "tbl_df")
   expect_identical(nrow(samples), as.integer(25600))
@@ -55,7 +55,7 @@ test_that("reading grid sampler output works", {
 })
 
 test_that("conversion of EMCEE to mcmc.list works", {
-  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+  fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
   samples <- read.emcee(fname)
   ml <- mcmc.list.from.emcee(samples)
   expect_s3_class(ml, "mcmc.list")
@@ -93,7 +93,7 @@ test_that("remove.burnin removes samples from each chain for MH", {
 })
 
 test_that("remove.burnin removes samples from each walker for emcee", {
-  fname <- system.file("extdata", "sampler-output-demo5.txt", package = "rcosmosis")
+  fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
   samples <- read.emcee(fname)
   expect_equal(min(samples$sample), 1)
   good_samples <- remove.burnin(samples, 123)
