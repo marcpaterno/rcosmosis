@@ -64,9 +64,9 @@ test_that("conversion of EMCEE to mcmc.list works", {
 
 get_mh_fileglob <- function() {
   dirname <- system.file("extdata", "run20", package = "rcosmosis")
-  filenames <- dir(dirname, "chain_metro_20_.*\\.txt")
+  filenames <- dir(dirname, "chain_metro_20_.*\\.txt.xz")
   expect_equal(length(filenames), 32)
-  fglob <- file.path(dirname, "chain_metro_20_*.txt")
+  file.path(dirname, "chain_metro_20_*.txt.xz")
 }
 
 test_that("reading MH chains works", {
@@ -78,7 +78,7 @@ test_that("reading MH chains works", {
 
 test_that("conversion of MH chains to mcmc.list works", {
   dirname <- system.file("extdata", "run20", package = "rcosmosis")
-  fglob <- file.path(dirname, "chain_metro_20_*.txt")
+  fglob <- file.path(dirname, "chain_metro_20_*.txt.xz")
   samples <- read.metropolis.hastings(fglob)
   ml <- mcmc.list.from.metropolis.hastings(samples)
   expect_s3_class(ml, "mcmc.list")
