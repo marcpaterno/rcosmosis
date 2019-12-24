@@ -4,7 +4,7 @@
 \alias{read.cosmosis.mcmc}
 \title{Create a data frame from CosmoSIS MCMC sampler output.}
 \usage{
-read.cosmosis.mcmc(fname, burn = 0)
+read.cosmosis.mcmc(fname, burn = 0L, drop.nonsampling = TRUE)
 }
 \arguments{
 \item{fname}{The name of the CosmoSIS MCMC sampler output file to be read.
@@ -12,6 +12,8 @@ making the data frame}
 
 \item{burn}{The length of the burn-in period; these samples are ignored in
 making the data frame.}
+
+\item{drop.nonsampling}{(default TRUE) if TRUE, non-sampling columns are dropped}
 }
 \value{
 a CosmoSIS MCMC data frame

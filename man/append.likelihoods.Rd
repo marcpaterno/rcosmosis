@@ -7,10 +7,10 @@
 append.likelihoods(d)
 }
 \arguments{
-\item{d}{A data.frame containing a column of log-likelihoods named loglike.}
+\item{d}{A data.frame containing a column of log-likelihoods named loglike or like.}
 }
 \value{
-The augmented data.frame.
+The augmented data.frame, with a column `like` containing likelihoods
 }
 \description{
 Append (normalized) likelihoods to a data.frame containing log-likelihoods.

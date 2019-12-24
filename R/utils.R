@@ -30,7 +30,7 @@ append.likelihoods <- function(d) {
   # If so, rename it loglike.
   if ("like" %in% names(d))
   {
-    if (any(d$like < 0.0)){
+    if (any(d["like"] < 0.0)){
       # this is really log likelihood, not likelihood
       d <- dplyr::rename(d, loglike = like)
     }

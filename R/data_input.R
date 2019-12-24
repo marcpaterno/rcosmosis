@@ -140,7 +140,6 @@ read.cosmosis.mcmc <- function(fname, burn = 0L, drop.nonsampling = TRUE)
 #'
 #' @export
 #' @param fname The name of the CosmoSIS MCMC sampler output file to be read.
-#'   making the data frame
 #'
 #' @return a CosmoSIS MCMC dataframe
 #'
@@ -203,6 +202,27 @@ read.metropolis.hastings <- function(fileglob)
                    })
   # Combine into one dataframe
   dplyr::bind_rows(tbls)
+}
+
+#' read.multinest
+#'
+#' @param fname The name of the CosmoSIS output file to be read
+#' @param remove.small If TRUE, remove very small weights
+#'
+#' @return a weighted CosmoSIS dataframe
+#' @export
+#'
+read.multinest <- function(fname, remove.small = TRUE)
+{
+  checkmate::expect_scalar(fname)
+  checkmate::expect_string(fname)
+  checkmate::expect_file_exists(fname)
+  checkmate::expect_scalar(remove.small)
+  d <- read.cosmosis.mcmc(fname)
+  d$sample <- 1:nrow(d)
+  if (remove.small)
+    d <- dplyr::filter(d, .data$weight > .Machine$double.xmin)
+  d
 }
 
 #' emcee.count.walkers Return the number of walkers used for this EMCEE run.

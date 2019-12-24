@@ -70,8 +70,8 @@ get_mh_fileglob <- function() {
 test_that("reading MH chains works", {
 
   samples <- read.metropolis.hastings(get_mh_fileglob())
-  testthat::expect_identical(names(samples), c("omega_m", "sigma8_input", "concentration", "chain", "sample"))
-  testthat::expect_equal(nrow(samples), 32*1000)
+  expect_identical(names(samples), c("omega_m", "sigma8_input", "concentration", "chain", "sample"))
+  expect_equal(nrow(samples), 32*1000)
 })
 
 test_that("conversion of MH chains to mcmc.list works", {
@@ -96,4 +96,20 @@ test_that("remove.burnin removes samples from each walker for emcee", {
   expect_equal(min(samples$sample), 1)
   good_samples <- remove.burnin(samples, 123)
   expect_equal(min(good_samples$sample), 124)
+})
+
+test_that("reading Multinest output works", {
+  fname <- system.file("extdata/multinest", "chain_multi_1.txt.xz", package = "rcosmosis")
+  d <- read.multinest(fname)
+  expect_s3_class(d, "tbl_df")
+  expect_true(min(d$weight) >= .Machine$double.xmin)
+  expect_equal(nrow(d), 12948)
+})
+
+test_that("reading Multinest without trimming results works", {
+  fname <- system.file("extdata/multinest", "chain_multi_1.txt.xz", package = "rcosmosis")
+  d <- read.multinest(fname, remove.small = FALSE)
+  expect_s3_class(d, "tbl_df")
+  expect_equal(nrow(d), 13498)
+  expect_true(min(d$weight) == 0)
 })

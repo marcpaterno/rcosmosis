@@ -7,8 +7,7 @@
 read.emcee(fname)
 }
 \arguments{
-\item{fname}{The name of the CosmoSIS MCMC sampler output file to be read.
-making the data frame}
+\item{fname}{The name of the CosmoSIS MCMC sampler output file to be read.}
 }
 \value{
 a CosmoSIS MCMC dataframe
