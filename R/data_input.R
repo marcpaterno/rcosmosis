@@ -82,10 +82,14 @@ make.matterpower.dataframe <- function(dirname, type)
 #' @return A character vector containing the names of the parameters read from
 #'   the file.
 parse.cosmosis.parameters <- function(txt) {
-  tmp <- sub("#", "", txt)           # Remove comment
-  parts <- stringr::str_split(tmp, "\t")[[1]]    # split on tabs
-  cols <- sub("[a-zA-Z_]+--", "", parts) # remove leading section names
-  sub("(like)|(post)", "loglike", cols, fixed = FALSE)
+  # Remove comment
+  tmp <- sub("#", "", txt)
+  # split on tabs
+  parts <- stringr::str_split(tmp, "\t")[[1]]
+  # remove leading section names
+  cols <- sub("[a-zA-Z_]+--", "", parts)
+  cols
+  # sub("(like)|(post)", "loglike", cols, fixed = FALSE)
 }
 
 #' Create a data frame from CosmoSIS MCMC sampler output.
@@ -112,15 +116,23 @@ parse.cosmosis.parameters <- function(txt) {
 #'   making the data frame
 #' @param burn The length of the burn-in period; these samples are ignored in
 #'   making the data frame.
+#' @param drop.nonsampling (default TRUE) if TRUE, non-sampling columns are dropped
 #' @return a CosmoSIS MCMC data frame
-read.cosmosis.mcmc <- function(fname, burn = 0)
+read.cosmosis.mcmc <- function(fname, burn = 0L, drop.nonsampling = TRUE)
 {
   checkmate::assert_count(burn)
+  checkmate::assert_file_exists(fname)
+  checkmate::assert_scalar(drop.nonsampling)
   d <- utils::read.table(fname, as.is = TRUE)
-  if (burn>0) d <- d[-c(1:burn),]
+  if (burn > 0L)
+    d <- d[-c(1:burn), ]
   first <- readLines(fname, n = 1)
   names(d) <- parse.cosmosis.parameters(first)
-  d <- append.likelihoods(d)
+  if (drop.nonsampling)
+  {
+    names_to_keep = setdiff(names(d), non.sampling.columns())
+    d <- dplyr::select(d, names_to_keep)
+  }
   tibble::as_tibble(d)
 }
 
@@ -156,7 +168,7 @@ read.emcee <- function(fname)
 #'   \item{\code{z}}{An \code{m} by \code{n} matrix of log-likelihoods.} }
 read.cosmosis.grid <- function(fname)
 {
-  d <- utils::read.table(fname)
+  d <- utils::read.table(fname, as.is = TRUE)
   first <- readLines(fname, n = 1)
   names(d) <- parse.cosmosis.parameters(first)
   d <- append.likelihoods(d)
@@ -176,7 +188,6 @@ read.metropolis.hastings <- function(fileglob)
 {
   checkmate::expect_scalar(fileglob)
   checkmate::expect_string(fileglob)
-  tmp <- getwd()
   # Determine files to be read.
   fnames = Sys.glob(fileglob)
   stopifnot(length(fnames) > 0)
@@ -217,8 +228,7 @@ emcee.count.walkers <- function(txt) {
 #'
 mcmc.list.from.emcee <- function(tbl)
 {
-  lst <- dplyr::select(tbl, -c(.data$loglike, .data$like)) %>%
-         dplyr::group_by(.data$walker) %>%
+  lst <- dplyr::group_by(tbl, .data$walker) %>%
          dplyr::group_split(keep = FALSE)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
@@ -232,7 +242,7 @@ mcmc.list.from.emcee <- function(tbl)
 #'
 mcmc.list.from.metropolis.hastings <- function(tbl)
 {
-  lst <- dplyr::select(tbl, -c(.data$loglike, .data$like, .data$sample)) %>%
+  lst <- dplyr::select(tbl, -c(.data$sample)) %>%
          dplyr::group_by(.data$chain) %>%
          dplyr::group_split(keep = FALSE)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
@@ -251,3 +261,11 @@ remove.burnin <- function(x, n)
   checkmate::expect_scalar(n)
   dplyr::filter(x, .data$sample > n)
 }
+
+nchain <- function(x)
+{
+  checkmate::check_data_frame(x)
+  length(unique(x$chain))
+}
+
+

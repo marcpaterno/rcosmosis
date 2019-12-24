@@ -23,11 +23,30 @@ cols2vmat <- function(d) {
 
 #' Append (normalized) likelihoods to a data.frame containing log-likelihoods.
 #'
-#' @param d A data.frame containing a column of log-likelihoods named loglike.
-#' @return The augmented data.frame.
+#' @param d A data.frame containing a column of log-likelihoods named loglike or like.
+#' @return The augmented data.frame, with a column `like` containing likelihoods
 append.likelihoods <- function(d) {
+  # If we have a `likes` column, test to see if it is really log(likelihood).
+  # If so, rename it loglike.
+  if ("like" %in% names(d))
+  {
+    if (any(d$like < 0.0)){
+      # this is really log likelihood, not likelihood
+      d <- dplyr::rename(d, loglike = like)
+    }
+  }
   likes <- exp(d$loglike)
   norm <- sum(likes)
   d$like <- likes/norm
   d
+}
+
+#' non.sampling.columns
+#'
+#' @return character The names of the columns in CosmoSIS output that we do *not* want to return.
+#'
+#' @examples
+non.sampling.columns <- function()
+{
+  c("like", "post", "loglike", "prior")
 }

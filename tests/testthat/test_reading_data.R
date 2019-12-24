@@ -4,13 +4,13 @@ context("Reading CosmoSIS files")
 test_that("parsing parameter names from pre-fcc1161b sampler files works", {
   text <- "#cosmological_parameters--omega_m	cosmological_parameters--h0	supernova_params--deltam	supernova_params--alpha	supernova_params--beta	like"
   res <- parse.cosmosis.parameters(text)
-  expect_identical(res, c("omega_m", "h0", "deltam", "alpha", "beta", "loglike"))
+  expect_identical(res, c("omega_m", "h0", "deltam", "alpha", "beta", "like"))
 })
 
 test_that("parsing parameter names from post-fcc1161b sampler files works", {
   text <- "#cosmological_parameters--omega_m	post"
   res <- parse.cosmosis.parameters(text)
-  expect_identical(res, c("omega_m", "loglike"))
+  expect_identical(res, c("omega_m", "post"))
 })
 
 test_that("parsing number of walkers from EMCEE output works", {
@@ -26,10 +26,9 @@ test_that("reading MCMC sampler output works", {
   samples <- read.cosmosis.mcmc(fname, 5600)
   expect_s3_class(samples, "tbl_df")
   expect_identical(nrow(samples), as.integer(20*1000))
-  expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like"))
+  expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta"))
   # All the columns in samples must be numeric
   expect_identical(unique(sapply(samples, class)), "numeric")
-  expect_equal(sum(samples$like), 1.0)
 })
 
 test_that("reading EMCEE sampler output works", {
@@ -37,9 +36,8 @@ test_that("reading EMCEE sampler output works", {
   samples <- read.emcee(fname)
   expect_s3_class(samples, "tbl_df")
   expect_identical(nrow(samples), as.integer(25600))
-  expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "loglike", "like", "walker", "sample"))
+  expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "walker", "sample"))
   # All the columns in samples must be numeric
-  expect_equal(sum(samples$like), 1.0)
   expect_equal(max(samples$sample), 400)
   expect_equal(max(samples$walker), 64)
 })
@@ -72,7 +70,7 @@ get_mh_fileglob <- function() {
 test_that("reading MH chains works", {
 
   samples <- read.metropolis.hastings(get_mh_fileglob())
-  testthat::expect_identical(names(samples), c("omega_m", "sigma8_input", "concentration", "prior", "loglike", "like", "chain", "sample"))
+  testthat::expect_identical(names(samples), c("omega_m", "sigma8_input", "concentration", "chain", "sample"))
   testthat::expect_equal(nrow(samples), 32*1000)
 })
 
