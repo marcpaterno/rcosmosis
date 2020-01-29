@@ -2,10 +2,12 @@
 
 export(emcee.convergence.plot)
 export(emcee.count.walkers)
+export(find.contours)
 export(make.matterpower.dataframe)
 export(make.theory.dataframe)
 export(mcmc.list.from.emcee)
 export(mcmc.list.from.metropolis.hastings)
+export(plot_density_2d)
 export(read.cosmosis.grid)
 export(read.cosmosis.mcmc)
 export(read.emcee)

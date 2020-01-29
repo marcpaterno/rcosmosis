@@ -1,4 +1,3 @@
-library(rcosmosis)
 context("Reading CosmoSIS files")
 
 test_that("parsing parameter names from pre-fcc1161b sampler files works", {

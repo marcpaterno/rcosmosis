@@ -45,8 +45,31 @@ append.likelihoods <- function(d) {
 #'
 #' @return character The names of the columns in CosmoSIS output that we do *not* want to return.
 #'
-#' @examples
 non.sampling.columns <- function()
 {
   c("like", "post", "loglike", "prior")
+}
+
+#' Find values at which given KDE takes specified values
+#'
+#' @export
+#' @param kde a list containing `x`- and `y`- arrays, and a `z`-matrix, as from MASS::kde2d (see below)
+#' @param levels the required probability content of the contours (see below)
+#'
+#' @return the values of `z` that define the minimum-area regions with the specified probability contents
+#'
+#' Given a list `kde` containing `x` and `y` (the x- and y-coordinates of grid points) and `z`
+#' (values proportional to a probability density at those grid points), we calculate the
+#' minimum-area contours which contain the probability contents specified in `levels`. All
+#' the values in `levels` must be between 0 and 1.
+#'
+find.contours <- function(kde, levels = c(0.6826895, 0.9544997, 0.9973002))
+{
+  norm <- sum(kde$z)
+  kde$z <- kde$z/norm
+  probs.sorted <- sort(kde$z, decreasing = TRUE)
+  probs.cs <- cumsum(probs.sorted)
+  # Get the indices of the first values greater than the given confidence levels.
+  indices <- sapply(levels, function(x) which(probs.cs > x)[1])
+  probs.sorted[indices]
 }
