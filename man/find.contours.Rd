@@ -13,7 +13,6 @@ find.contours(kde, levels = c(0.6826895, 0.9544997, 0.9973002))
 }
 \value{
 the values of `z` that define the minimum-area regions with the specified probability contents
-
 Given a list `kde` containing `x` and `y` (the x- and y-coordinates of grid points) and `z`
 (values proportional to a probability density at those grid points), we calculate the
 minimum-area contours which contain the probability contents specified in `levels`. All

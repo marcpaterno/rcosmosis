@@ -57,7 +57,6 @@ non.sampling.columns <- function()
 #' @param levels the required probability content of the contours (see below)
 #'
 #' @return the values of `z` that define the minimum-area regions with the specified probability contents
-#'
 #' Given a list `kde` containing `x` and `y` (the x- and y-coordinates of grid points) and `z`
 #' (values proportional to a probability density at those grid points), we calculate the
 #' minimum-area contours which contain the probability contents specified in `levels`. All
@@ -72,4 +71,18 @@ find.contours <- function(kde, levels = c(0.6826895, 0.9544997, 0.9973002))
   # Get the indices of the first values greater than the given confidence levels.
   indices <- sapply(levels, function(x) which(probs.cs > x)[1])
   probs.sorted[indices]
+}
+
+
+#' convert output of kde2d into a dataframe
+#'
+#' @param u the kde2d result to be converted
+#'
+#' @return a dataframe with columns `x`, `y` and `z`.
+#' @export
+#'
+vmat2df <- function(u)
+{
+  g = expand.grid(u$x, u$y)
+  tibble::tibble( x = g$Var1, y = g$Var2, z = as.numeric(u$z))
 }
