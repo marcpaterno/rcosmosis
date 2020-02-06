@@ -65,6 +65,7 @@ emcee.convergence.plot <-
 #' @return a ggplot object
 #'
 #' @import ggplot2
+#' @importFrom stats density
 #' @export
 #'
 #' @examples
@@ -90,9 +91,9 @@ plot_density_2d <-
   dxy <- vmat2df(kde)
   ggplot(data = data, mapping = aes(x = !!x, y = !!y)) +
     geom_hex(mapping = aes(fill = stat(log(density))), bins = bins) +
-    geom_hex(mapping = aes(fill = stat(count)), bins = bins) +
+    geom_hex(mapping = aes(fill = stat(.data$count)), bins = bins) +
     scale_fill_continuous(type = "gradient") +
-    geom_contour(data = dxy, mapping = aes(x, y, z=z), breaks = breaks, color = "red") +
+    geom_contour(data = dxy, mapping = aes(x, y, z=.data$z), breaks = breaks, color = "red") +
     scale_x() +
     scale_y() +
     theme_bw()

@@ -32,7 +32,7 @@ append.likelihoods <- function(d) {
   {
     if (any(d["like"] < 0.0)){
       # this is really log likelihood, not likelihood
-      d <- dplyr::rename(d, loglike = like)
+      d <- dplyr::rename(d, loglike = .data$like)
     }
   }
   likes <- exp(d$loglike)
