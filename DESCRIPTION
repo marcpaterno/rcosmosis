@@ -1,6 +1,6 @@
 Package: rcosmosis
 Title: R functions to support CosmoSIS
-Version: 0.0.0.9105
+Version: 0.0.0.9106
 Authors@R: "Marc Paterno <paterno@fnal.gov> [aut, cre]"
 Description: rcosmosis provides functions useful in the analysis of the
     output of CosmoSIS. CosmoSIS is a framework for structuring
@@ -16,6 +16,7 @@ Imports: checkmate(>= 1.9.4),
          dplyr(>= 0.8.3),
          ggplot2(>= 3.2.1),
          magrittr(>= 1.5),
+         mvtnorm(>= 1.1-0),
          MASS(>= 7.3),
          rlang(>= 0.4.2),
          rlist(>= 0.4.6.1),
@@ -24,6 +25,14 @@ Imports: checkmate(>= 1.9.4),
 License: MIT + file LICENSE
 LazyData: true
 Suggests:
-    testthat
+    gganimate,
+    gifski,
+    gridExtra,
+    here,
+    knitr,
+    rmarkdown,
+    testthat,
+    tidyverse
+VignetteBuilder: knitr
 URL: https://github.com/marcpaterno/rcosmosis.
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0

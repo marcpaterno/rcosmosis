@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{emcee.convergence.plot}
 \alias{emcee.convergence.plot}
-\title{Title emcee.convergence.plot}
+\title{Visualize the convergence of Emcee sampler output}
 \usage{
 emcee.convergence.plot(
   x,
@@ -31,5 +31,5 @@ all walkers}
 a ggplot object
 }
 \description{
-Title emcee.convergence.plot
+Visualize the convergence of Emcee sampler output
 }

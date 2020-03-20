@@ -2,23 +2,21 @@
 % Please edit documentation in R/utils.R
 \name{cols2vmat}
 \alias{cols2vmat}
-\title{Transform a data.frame carrying grid-oriented data into a list of grid
+\title{Transform a dataframe carrying grid-oriented data into a list of grid
 vectors and a data matrix.}
 \usage{
 cols2vmat(d)
 }
 \arguments{
-\item{d}{A data.frame where the first \code{n} columns are vectors of grid
-coordinates, and the final 2 columns contain log-likelihoods and normalized
-likelihoods. The grid coorindate columns should be in order from least
-rapidly varying to most rapidly varying.}
+\item{d}{A data.frame with 3 columns. The first two columns must be vectors of grid
+coordinates, and the final column contains the value at that grid coordinate.}
 }
 \value{
-a list of length n; the first n-1 entries are the grid values in each
-  direction, and the last entry is the (n-1) dimensional array of the data
-  values at each grid point.
+a list of length 3; the first 2 entries are vectors of the grid values in each
+  direction, and the last entry is the 2 dimensional matrix of the data
+  values.
 }
 \description{
-Transform a data.frame carrying grid-oriented data into a list of grid
+Transform a dataframe carrying grid-oriented data into a list of grid
 vectors and a data matrix.
 }

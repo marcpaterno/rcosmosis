@@ -1,4 +1,4 @@
-#' Title emcee.convergence.plot
+#' Visualize the convergence of Emcee sampler output
 #'
 #' @param x : a dataframe made from emcee sampler output
 #' @param panels : logical, if TRUE use panels to separate walkers
@@ -52,7 +52,7 @@ emcee.convergence.plot <-
     p
   }
 
-#' plot_density_2d
+#' Produce a 2-d hexgrid + contour plot from CosmoSIS MCMC output
 #'
 #' @param data a CosmoSIS MCMC dataframe
 #' @param x the variable to be plotted on the x-axis

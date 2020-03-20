@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotting.R
 \name{plot_density_2d}
 \alias{plot_density_2d}
-\title{plot_density_2d}
+\title{Produce a 2-d hexgrid + contour plot from CosmoSIS MCMC output}
 \usage{
 plot_density_2d(
   data,
@@ -33,7 +33,7 @@ plot_density_2d(
 a ggplot object
 }
 \description{
-plot_density_2d
+Produce a 2-d hexgrid + contour plot from CosmoSIS MCMC output
 }
 \examples{
 \dontrun{

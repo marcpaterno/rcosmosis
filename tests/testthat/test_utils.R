@@ -1,33 +1,63 @@
-context("CosmoSIS internal utilities")
+context("rcosmosis internal utilities")
 
-test_that("append.likelihoods works", {
-  x <- data.frame(x = 1:5, loglike = exp(-(1:5)))
-  y <- append.likelihoods(x)
-  expect_identical(names(y), c("x","loglike", "like"))
-  expect_equal(sum(y$like), 1.0)
-})
 
-test_that("transforming data.frame to vector/matrix form works", {
-  df <- data.frame(x = rep(11:14, each = 4, rep = 2),
-                   y = rep(1:2, each = 2, rep = 8),
-                   z = rep(21:22, rep = 8))
-  df$loglike <- with(df, -exp(-x/10 - y/20 - z/100))
-  df$like <- exp(df$loglike)
-  norm <- sum(df$like)
-  df$like <- df$like/norm
+test_that("cols2vmat converts 2-d grid", {
+  df <- tibble::tibble(x = rep(11:14, each = 2, length.out = 8),
+                       y = rep(1:2, each = 1, length.out = 8))
+  df <- dplyr::mutate(df, loglike = x * y)
   res <- cols2vmat(df)
   expect_is(res, "list")
-  expect_equal(length(res), 4)
-  expect_identical(names(res), c("x", "y", "z", "like"), info = paste(names(res), collapse = " "))
+  expect_equal(length(res), 3)
+  expect_named(res, c("x", "y", "loglike"))
   expect_equal(res$x, 11:14)
   expect_equal(res$y, 1:2)
-  expect_equal(res$z, 21:22)
-  expect_is(res$like, "array")
+  expect_is(res$loglike, "matrix")
+  expect_equal(dim(res$loglike), c(4, 2))
+  expect_equal(res$loglike[,1], 11:14)
+  expect_equal(res$loglike[,2], 2 * (11:14))
 })
 
-# test_that("finding contours in unit bivarian gaussian works", {
-#   data <- tibble::as_tibble(mvtnorm::rmvnorm(100*1000, mean=c(0,0)),
-#                             .name_repair = "minimal")
-#   names(data) <- c("x", "y")
-#   data <- dplyr::mutate(data, r = sqrt(x**2 + y**2))
-# })
+test_that("vmat2df reverses cols2vmat for 2d data", {
+  x <- tibble::tibble(u = rep(11:14, each = 2, length.out = 8),
+                      v = rep(1:2, each = 1, length.out = 8))
+  x <- dplyr::mutate(x, q = exp(-(u-12.5)**2 + (v-1.25)**2))
+  vm <- cols2vmat(x)
+  y <- vmat2df(vm)
+  expect_is(y, "tbl_df")
+  expect_equal(x, y)
+})
+
+#' Calculate fractional differences between two vectors
+#'
+#' @param x
+#' @param y
+#'
+#' @return fraction difference between x and y
+#'
+frac_diff <- function(x, y) {
+  maxes <- pmax(x, y)
+  abs(x-y)/maxes
+}
+
+test_that("finding contours in unit bivarian gaussian works", {
+  # Generate bivariate Gaussian samples, "x" and "y".
+  set.seed(123)
+  data <-
+    tibble::as_tibble(mvtnorm::rmvnorm(10 * 1000,
+                                       mean = c(0, 0)),
+                      .name_repair = "minimal")
+  names(data) <- c("x", "y")
+  data <- dplyr::mutate(data, r = sqrt(x ** 2 + y ** 2))
+  # Calculate and normalize the probabilities.
+  kde <- MASS::kde2d(data$x, data$y, n = 51)
+  kde$z <- kde$z / sum(kde$z)
+  # Find the contours for 0.10, 0.30, and 0.50 percentiles.
+  contours <- find.contours(kde, c(0.70, 0.30, 0.50))
+  # Test that the contained fractions are correct.
+  p.70 <- kde$z[kde$z >= contours[1]] %>% sum
+  p.30 <- kde$z[kde$z >= contours[2]] %>% sum
+  p.50 <- kde$z[kde$z >= contours[3]] %>% sum
+  expect_lte(frac_diff(p.70, 0.70), 0.01)
+  expect_lte(frac_diff(p.30, 0.30), 0.01)
+  expect_lte(frac_diff(p.50, 0.50), 0.01)
+})

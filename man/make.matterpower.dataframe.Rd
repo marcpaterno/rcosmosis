@@ -22,3 +22,8 @@ It is assumed the file format is the CosmoSIS format for storing power
 spectra. Note this format is different from the format used for the storage
 of scalar parameters.
 }
+\examples{
+> mpdf <- make.matterpower.dataframe(here::here("inst/extdata/demo_output_1/matter_power_nl"), "nl")
+> mpdf \%>\% filter(z \%in\% c(0, 1, 2, 3, 4)) \%>\%
+  ggplot(aes(k_h, p_k, color=factor(z))) + geom_line() + scale_x_log10() + scale_y_log10()
+}

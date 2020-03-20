@@ -1,44 +1,21 @@
-
-#' Transform a data.frame carrying grid-oriented data into a list of grid
+#' Transform a dataframe carrying grid-oriented data into a list of grid
 #' vectors and a data matrix.
 #'
-#' @param d A data.frame where the first \code{n} columns are vectors of grid
-#'   coordinates, and the final 2 columns contain log-likelihoods and normalized
-#'   likelihoods. The grid coorindate columns should be in order from least
-#'   rapidly varying to most rapidly varying.
-#' @return a list of length n; the first n-1 entries are the grid values in each
-#'   direction, and the last entry is the (n-1) dimensional array of the data
-#'   values at each grid point.
+#' @param d A data.frame with 3 columns. The first two columns must be vectors of grid
+#'   coordinates, and the final column contains the value at that grid coordinate.
+#' @return a list of length 3; the first 2 entries are vectors of the grid values in each
+#'   direction, and the last entry is the 2 dimensional matrix of the data
+#'   values.
+#' @export
 cols2vmat <- function(d) {
-  likelihoods <- d$like
-  if (is.null(likelihoods)) stop(names(d))
-  cols <- d[, 1:(length(d) - 2)] # Subsetting to keep all but the last two columns
-  # Note that as.list does not copy its argument, it modifies it.
-  cols <- as.list(cols)
-  result <- lapply(cols, unique)
-  ary <- array(likelihoods, dim = lapply(result, length))
-  result$like <- ary
-  result
-}
-
-#' Append (normalized) likelihoods to a data.frame containing log-likelihoods.
-#'
-#' @param d A data.frame containing a column of log-likelihoods named loglike or like.
-#' @return The augmented data.frame, with a column `like` containing likelihoods
-append.likelihoods <- function(d) {
-  # If we have a `likes` column, test to see if it is really log(likelihood).
-  # If so, rename it loglike.
-  if ("like" %in% names(d))
-  {
-    if (any(d["like"] < 0.0)){
-      # this is really log likelihood, not likelihood
-      d <- dplyr::rename(d, loglike = .data$like)
-    }
-  }
-  likes <- exp(d$loglike)
-  norm <- sum(likes)
-  d$like <- likes/norm
-  d
+  checkmate::check_data_frame(d, ncols = 3)
+  d <- dplyr::arrange_all(d)
+  xvals <- unique(dplyr::pull(d, 1))
+  yvals <- unique(dplyr::pull(d, 2))
+  vals <- dplyr::pull(d)
+  res <- list(xvals, yvals, t(matrix(vals, ncol = length(xvals), nrow = length(yvals))))
+  names(res) <- names(d)
+  res
 }
 
 #' non.sampling.columns
@@ -83,6 +60,9 @@ find.contours <- function(kde, levels = c(0.6826895, 0.9544997, 0.9973002))
 #'
 vmat2df <- function(u)
 {
-  g = expand.grid(u$x, u$y)
-  tibble::tibble( x = g$Var1, y = g$Var2, z = as.numeric(u$z))
+  g <- expand.grid(u[[2]], u[[1]])
+  zdata <- t(u[[3]])
+  res <- tibble::tibble(x = g$Var2, y = g$Var1, z = as.numeric(zdata))
+  names(res) <- names(u)
+  res
 }

@@ -1,0 +1,273 @@
+---
+title: "Analysis of Emcee CosmoSIS output"
+author: "Marc Paterno"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Analysis of Emcee CosmoSIS output}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(gganimate)
+library(rcosmosis)
+library(gifski)
+library(gridExtra)
+```
+
+## Emcee analysis
+
+First we read the Emcee output file,
+and create a dataframe. The beginning of the dataframe looks like:
+
+```{r read-emcee}
+samples <- read.emcee(here::here("inst/extdata/chain_emcee_1024.txt.xz"))
+head(samples) %>% knitr::kable()
+```
+
+```{r}
+nwalkers            <- max(samples$walker)
+nsamples_per_walker <- max(samples$sample)
+nsamples            <- nrow(samples)
+```
+
+We have `r nwalkers` walkers, each with `r nsamples_per_walker` samples,
+for a total of `r nsamples` samples.
+
+## The burn-in period
+
+```{r}
+nhead = 100
+```
+
+To study the burn-in period, we'll be looking only at the first
+`r nhead` values from each walker.
+
+First we look at scatterplots of the first `r nhead` samples from each walker.
+Each plot shows a different pair of variables. Each point corresponds to one sample.
+The color of the point indicated which of the `r nwalkers` was sampled.
+Note that the palette of colors is limited, so the same color is used for many different walkers
+
+```{r p1a}
+p1a <-
+  samples %>%
+  filter(sample < nhead) %>%
+  ggplot(aes(omega_m, sigma8_input, color = factor(walker))) +
+  geom_point(show.legend = FALSE)
+
+p1a
+```
+
+```{r p1b}
+p1b <-
+  samples %>%
+  filter(sample < nhead) %>%
+  ggplot(aes(omega_m, concentration, color = factor(walker))) +
+  geom_point(show.legend = FALSE)
+
+p1b
+```
+
+
+```{r p1c}
+p1c <-
+  samples %>%
+  filter(sample < nhead) %>%
+  ggplot(aes(sigma8_input, concentration, color = factor(walker))) +
+  geom_point(show.legend = FALSE)
+
+p1c
+```
+
+These plots don't provide a good idea of the path each walker takes
+from sample to sample.
+We can show this by animating the plots,
+with one animation frame for each sample number.
+
+<!-- ```{r p1a-anim} -->
+<!-- p1a + -->
+<!--   transition_time(sample) + -->
+<!--   labs(title = "Sample: {frame_time}") -->
+<!-- ``` -->
+
+<!-- ```{r p1b-anim} -->
+<!-- p1b + -->
+<!--   transition_time(sample) + -->
+<!--   labs(title = "Sample: {frame_time}")   -->
+<!-- ``` -->
+
+<!-- ```{r p1c-anim} -->
+<!-- p1c + -->
+<!--   transition_time(sample) + -->
+<!--   labs(title = "Sample: {frame_time}") -->
+<!-- ``` -->
+
+## Has the chain converged?
+
+One way to evaluate convergence of the chain is to look at how the walkers
+progress as a function of sample number;
+this is often called a *trace* for the walker.
+
+One thing we want is see is *mixing*. It is important that the different walkers
+do not produce traces that stay separated; they should "forget" their initial
+values, and produce traces that eventually are well-mixed.
+
+Since there are too many walkers to visualize this, we look only at the first 4
+walkers:
+
+
+```{r q1}
+q1 <-
+  samples %>%
+  filter(walker %in% 1:4) %>%
+  ggplot(aes(sample, omega_m, color = factor(walker))) +
+  geom_point(show.legend = FALSE) +
+  geom_path(show.legend = FALSE)
+```
+
+```{r q2}
+q2 <-
+  samples %>%
+  filter(walker %in% 1:4) %>%
+  ggplot(aes(sample, sigma8_input, color = factor(walker))) +
+  geom_point(show.legend = FALSE) +
+  geom_path(show.legend = FALSE)
+```
+
+```{r q3}
+q3 <-
+  samples %>%
+  filter(walker %in% 1:4) %>%
+  ggplot(aes(sample, concentration, color = factor(walker))) +
+  geom_point(show.legend = FALSE) +
+  geom_path(show.legend = FALSE)
+```
+
+```{r qplot}
+grid.arrange(q3, q1, q2, nrow = 3)
+```
+
+An animation showing all the chains helps visual the mixing.
+To make this animation, we first must transform the data
+from a form that has one row per sample per walker,
+to one that has one row per sample per walker per physical parameter.
+This reshaping allows us to condition the plot on the name of the physical
+parameter, and thus to have a single graphic to animate.
+
+The transformation of the data is done using `tidyr::pivot_longer`.
+
+```{r x}
+x <-
+  samples %>%
+  pivot_longer(-c(sample,walker), names_to = "param", values_to = "val")
+```
+
+Producing the plot is now simple.
+
+# ```{r xplot}
+# p <-
+#   ggplot(x, aes(sample, val, color = factor(walker))) +
+#   geom_path(show.legend = FALSE) +
+#   facet_wrap(vars(param), scales = "free", ncol = 1)
+# p + transition_reveal(sample)
+# ```
+
+We can also look at how the marginal density for each parameter converges as we go through
+fixed-size batches of samples. We'll group the data by 20-sample batches (for each walker).
+As above, we need to re-organize the `samples` dataframe, but this time we don't thin out the samples,
+and we also assign samples to batches.
+
+```{r batches}
+b <- samples %>%
+  mutate(batch = sample %/% 20) %>%
+  pivot_longer(-c(sample, walker, batch), names_to = "param", values_to = "val")
+```
+
+<!-- We can then histogram the posterior densities, and observe how they change from batch to batch. -->
+<!-- ```{r} -->
+<!-- ggplot(b, aes(val)) + -->
+<!--   geom_histogram(aes(y = ..density..), bins = 50) +  -->
+<!--   geom_histogram(bins = 100) + -->
+<!--   facet_wrap(vars(param), scales = "free", ncol = 1) + -->
+<!--   transition_time(batch) -->
+<!-- ``` -->
+
+
+## Posterior densities
+
+```{r nburn, cache = TRUE}
+nburn <- 300
+```
+
+For all our analysis of posterior distributions, we'll drop the first `r nburn` elements of each chain.
+
+### 1-d marginal densities
+
+We use a combined histogram and kernel density plot to show the 1-d marginal distributions.
+
+```{r d1, dependson = "nburn"}
+x %>%
+  filter(sample > nburn) %>%
+  ggplot(aes(val)) +
+  geom_histogram(aes(y = ..density..), bins = 50) + 
+  geom_density(color = "red") +
+  facet_wrap(vars(param), scales = "free", ncol = 1)
+```
+
+The posterior for `concentration` has a long high-end tail, and so a log scale in *x* can be useful.
+```{r dconc, dependson = "nburn"}
+x %>%
+  filter(param == "concentration", sample > nburn) %>%
+  ggplot(aes(val)) +
+  geom_histogram(aes(y = ..density..), bins = 50) +
+  geom_density(color = "red") +
+  xlab("concentration") +
+  scale_x_log10()
+```
+
+
+### 2-d marginal densities
+
+We are using *hexbin* plots to show 2-d posterior densities because this
+produces few, and easy to understand, artifacts in the plotting.
+We use a log scale for the density because of wide range of density.
+We also plot the contours produced by a 2D kernel density estimator,
+for comparison with the hexbin results.
+
+```{r d1a, dependson = c("geom", "nburn")}
+samples %>%
+  filter(sample > nburn) %>%
+  plot_density_2d(omega_m, sigma8_input)
+```
+
+```{r d1b, dependson = c("geom", "nburn")}
+samples %>%
+  filter(sample > nburn) %>%
+  plot_density_2d(omega_m, concentration, scale_y = scale_y_log10)
+```
+
+```{r d1c, dependson = c("geom", "nburn")}
+samples %>%
+  filter(sample > nburn) %>%
+  plot_density_2d(sigma8_input, concentration, scale_y = scale_y_log10)
+```
+
+### Statistical summaries
+
+```{r}
+samples %>%
+  select(-c(walker, sample)) %>%
+  pivot_longer(everything(), names_to = "param", values_to = "val") %>%
+  group_by(param) %>%
+  summarize(mean = mean(val),
+            median = median(val),
+            sd = sd(val),
+            mad = mad(val),
+            "5%" = quantile(val, 0.05),
+            "95%" = quantile(val, 0.95)) %>%
+  knitr::kable()
+```
+

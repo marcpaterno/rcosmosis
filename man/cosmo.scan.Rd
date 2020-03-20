@@ -2,8 +2,7 @@
 % Please edit documentation in R/data_input.R
 \name{cosmo.scan}
 \alias{cosmo.scan}
-\title{Read data from a CosmoSIS format linearized matrix sample file,
-e.g. a power spectrum file.}
+\title{Read data from a CosmoSIS format linearized matrix sample file, e.g. a power spectrum file.}
 \usage{
 cosmo.scan(dirname, filename, quiet = TRUE)
 }
@@ -18,6 +17,5 @@ cosmo.scan(dirname, filename, quiet = TRUE)
 The vector of values.
 }
 \description{
-Read data from a CosmoSIS format linearized matrix sample file,
-e.g. a power spectrum file.
+Read data from a CosmoSIS format linearized matrix sample file, e.g. a power spectrum file.
 }
