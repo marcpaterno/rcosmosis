@@ -1,1 +1,6 @@
+dist: bionic
 language: r
+addons:
+  apt:
+    packages:
+    - cargo
