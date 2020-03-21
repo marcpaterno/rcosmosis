@@ -2,13 +2,15 @@
 % Please edit documentation in R/plotting.R
 \name{plot_density_2d}
 \alias{plot_density_2d}
-\title{Produce a 2-d hexgrid + contour plot from CosmoSIS MCMC output}
+\title{Produce a 2-d posterior density plot}
 \usage{
 plot_density_2d(
   data,
   x,
   y,
   bins = 50,
+  xlabel = NULL,
+  ylabel = NULL,
   scale_x = scale_x_continuous,
   scale_y = scale_y_continuous,
   levels = c(0.6826895, 0.9544997, 0.9973002)
@@ -23,6 +25,10 @@ plot_density_2d(
 
 \item{bins}{the numbers of bins for both `x` and `y`}
 
+\item{xlabel}{label for x axis; if NULL, then name of `x` is used}
+
+\item{ylabel}{label for y axis; if NULL, then name of `y` is used}
+
 \item{scale_x}{position scale function for `x`}
 
 \item{scale_y}{position scale function for `y`}
@@ -33,7 +39,8 @@ plot_density_2d(
 a ggplot object
 }
 \description{
-Produce a 2-d hexgrid + contour plot from CosmoSIS MCMC output
+Produce a 2-d posterior density plot, using a combined hexbin and contour plot,
+including gradient coloring to show the relative density.
 }
 \examples{
 \dontrun{

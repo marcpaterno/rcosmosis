@@ -1,5 +1,4 @@
 # rcosmosis
-https://travis-ci.com/marcpaterno/rcosmosis.svg?branch=master
 
 [![Build status](https://travis-ci.com/marcpaterno/rcosmosis.svg?branch=master)](https://travis-ci.com/marcpaterno/rcosmosis)
 

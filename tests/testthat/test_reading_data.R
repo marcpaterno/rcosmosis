@@ -82,6 +82,15 @@ test_that("conversion of MH chains to mcmc.list works", {
   expect_equal(length(ml), max(samples$chain))
 })
 
+test_that("conversion of MH chains of unequal lengths to mcmc.list works", {
+  samples <- tibble::tibble(x = runif(11),
+                            sample = c(1:5, 1:6),
+                            chain = c(rep(1,5), rep(2,6)))
+  ml <- mcmc.list.from.metropolis.hastings(samples)
+  expect_s3_class(ml, "mcmc.list")
+  expect_equal(length(ml), 2)
+})
+
 test_that("remove.burnin removes samples from each chain for MH", {
  samples <- read.metropolis.hastings(get_mh_fileglob())
  expect_equal(min(samples$sample), 1)

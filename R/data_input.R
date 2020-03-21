@@ -259,12 +259,17 @@ mcmc.list.from.emcee <- function(tbl)
 #'
 #' @return an mcmc.list object
 #' @export
+#' @importFrom utils head
 #'
 mcmc.list.from.metropolis.hastings <- function(tbl)
 {
   lst <- dplyr::select(tbl, -c(.data$sample)) %>%
          dplyr::group_by(.data$chain) %>%
          dplyr::group_split(keep = FALSE)
+  # Because the input dataframe might now have the same number of samples for each chain
+  # (a sign that the run was terminated prematurely), truncate all to the shorted.
+  min_length <- min(sapply(lst, nrow))
+  lst <- lapply(lst, function(x) head(x, min_length))
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
 
