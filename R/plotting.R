@@ -70,7 +70,10 @@ emcee.convergence.plot <-
 #'
 #' @examples
 #' \dontrun{
-#'   dplyr::filter(samples, sample > nburn) %>% plot_density_2d(omega_m, sigma8_input)
+#'   dirname <- system.file("extdata", "run20", package = "rcosmosis")
+#'   fglob <- file.path(dirname, "chain_metro_20_*.txt.xz")
+#'   samples <- read.metropolis.hastings(fglob)
+#'   dplyr::filter(samples, sample > 100) %>% plot_density_2d(omega_m, sigma8_input)
 #' }
 plot_density_2d <-
   function(data,

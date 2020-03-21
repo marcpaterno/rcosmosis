@@ -112,3 +112,8 @@ test_that("reading Multinest without trimming results works", {
   expect_equal(nrow(d), 13498)
   expect_true(min(d$weight) == 0)
 })
+
+test_that("reading a matter power directory works", {
+  d <- make.matterpower.dataframe(here::here("inst/extdata/demo_output_1/matter_power_nl"), "nl")
+  expect_s3_class(d, "tbl_df")
+})

@@ -48,31 +48,27 @@ make.theory.dataframe <- function(fnames)
 #' @return A CosmoSIS matter power dataframe. If the directory does not exist,
 #'   the returned dataframe will be empty.
 #' @examples
-#' > mpdf <- make.matterpower.dataframe(here::here("inst/extdata/demo_output_1/matter_power_nl"), "nl")
-#' > mpdf %>% filter(z %in% c(0, 1, 2, 3, 4)) %>%
-#'   ggplot(aes(k_h, p_k, color=factor(z))) + geom_line() + scale_x_log10() + scale_y_log10()
-
-
+#' d <- make.matterpower.dataframe(here::here("inst/extdata/demo_output_1/matter_power_nl"), "nl")
+#' d
 make.matterpower.dataframe <- function(dirname, type)
 {
   # If the directory does not exist, return an empty dataframe.
-  if (!file.exists(dirname)) return(data.frame())
+  if (!file.exists(dirname)) return(tibble::tibble())
 
   # Scan each file, creating a vector of the right name
   # bind the columns into a dataframe.
 
-  z <- cosmo.scan(dirname, "z.txt")
-  k_h <- cosmo.scan(dirname, "k_h.txt")
-  p_k <- cosmo.scan(dirname, "p_k.txt")
-  nkh <- length(k_h)
+  z.in   <- cosmo.scan(dirname, "z.txt")
+  k_h.in <- cosmo.scan(dirname, "k_h.txt")
+  p_k.in <- cosmo.scan(dirname, "p_k.txt")
 
   # The p_k array carries the data for a matrix, with 'z' varying slowly
   # and 'k_h' varying rapidly. Thus to build the dataframe, we can rely
   # on the recycling rule to get k_h correct, but have to construct z
   # ourselves.
-  dframe <- data.frame(p_k = p_k,
-                       k_h = k_h,
-                       z = rep(z, each = nkh))
+  dframe <- tibble::tibble(p_k = p_k.in,
+                       k_h = rep(k_h.in, length(z.in)),
+                       z = rep(z.in, each = length(k_h.in)))
   dframe$type = type
   dframe
 }
