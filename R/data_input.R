@@ -146,10 +146,10 @@ read.cosmosis.mcmc <- function(fname, burn = 0L, drop.nonsampling = TRUE)
 #'
 read.emcee <- function(fname)
 {
-  num.walkers <- emcee.count.walkers(readLines(fname, 500))
+  num.walkers <- emcee.count.walkers(readLines(fname, 500L))
   x <- read.cosmosis.mcmc(fname)
   nsamples <- nrow(x)/num.walkers
-  x$walker <- rep(1:num.walkers, each = nsamples)
+  x$walker <- rep(1:num.walkers, times = nsamples)
   x$sample <- rep(1:(nsamples), each = num.walkers)
   x
 }

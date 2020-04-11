@@ -14,7 +14,7 @@ test_that("parsing parameter names from post-fcc1161b sampler files works", {
 
 test_that("parsing number of walkers from EMCEE output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
-  txt <- readLines(fname, n = 100)
+  txt <- readLines(fname, n = 100L)
   nwalkers <- emcee.count.walkers(txt)
   expect_identical(nwalkers, 64L)
 })
@@ -22,7 +22,7 @@ test_that("parsing number of walkers from EMCEE output works", {
 test_that("reading MCMC sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
 
-  samples <- read.cosmosis.mcmc(fname, 5600)
+  samples <- read.cosmosis.mcmc(fname, 5600L)
   expect_s3_class(samples, "tbl_df")
   expect_identical(nrow(samples), as.integer(20*1000))
   expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta"))
@@ -34,11 +34,14 @@ test_that("reading EMCEE sampler output works", {
   fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
   samples <- read.emcee(fname)
   expect_s3_class(samples, "tbl_df")
-  expect_identical(nrow(samples), as.integer(25600))
+  expect_identical(nrow(samples), 25600L)
   expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "walker", "sample"))
-  # All the columns in samples must be numeric
-  expect_equal(max(samples$sample), 400)
-  expect_equal(max(samples$walker), 64)
+  # Each walker should have he same range of sample values
+  ranges <- samples %>% group_by(walker) %>% summarize(first = min(sample), last = max(sample))
+  expect_equal(length(unique(ranges$first)), 1L)
+  expect_equal(length(unique(ranges$last)), 1L)
+  expect_equal(max(samples$sample), 400L)
+  expect_equal(max(samples$walker), 64L)
 })
 
 test_that("reading grid sampler output works", {
@@ -62,7 +65,7 @@ test_that("conversion of EMCEE to mcmc.list works", {
 get_mh_fileglob <- function() {
   dirname <- system.file("extdata", "run20", package = "rcosmosis")
   filenames <- dir(dirname, "chain_metro_20_.*\\.txt.xz")
-  expect_equal(length(filenames), 32)
+  expect_equal(length(filenames), 32L)
   file.path(dirname, "chain_metro_20_*.txt.xz")
 }
 
@@ -70,7 +73,7 @@ test_that("reading MH chains works", {
 
   samples <- read.metropolis.hastings(get_mh_fileglob())
   expect_identical(names(samples), c("omega_m", "sigma8_input", "concentration", "chain", "sample"))
-  expect_equal(nrow(samples), 32*1000)
+  expect_equal(nrow(samples), 32L*1000L)
 })
 
 test_that("conversion of MH chains to mcmc.list works", {
@@ -88,22 +91,22 @@ test_that("conversion of MH chains of unequal lengths to mcmc.list works", {
                             chain = c(rep(1,5), rep(2,6)))
   ml <- mcmc.list.from.metropolis.hastings(samples)
   expect_s3_class(ml, "mcmc.list")
-  expect_equal(length(ml), 2)
+  expect_equal(length(ml), 2L)
 })
 
 test_that("remove.burnin removes samples from each chain for MH", {
  samples <- read.metropolis.hastings(get_mh_fileglob())
- expect_equal(min(samples$sample), 1)
- good_samples <- remove.burnin(samples, 500)
- expect_equal(min(good_samples$sample), 501)
+ expect_equal(min(samples$sample), 1L)
+ good_samples <- remove.burnin(samples, 500L)
+ expect_equal(min(good_samples$sample), 501L)
 })
 
 test_that("remove.burnin removes samples from each walker for emcee", {
   fname <- system.file("extdata", "sampler-output-demo5.txt.xz", package = "rcosmosis")
   samples <- read.emcee(fname)
   expect_equal(min(samples$sample), 1)
-  good_samples <- remove.burnin(samples, 123)
-  expect_equal(min(good_samples$sample), 124)
+  good_samples <- remove.burnin(samples, 123L)
+  expect_equal(min(good_samples$sample), 124L)
 })
 
 test_that("reading Multinest output works", {
@@ -111,14 +114,14 @@ test_that("reading Multinest output works", {
   d <- read.multinest(fname)
   expect_s3_class(d, "tbl_df")
   expect_true(min(d$weight) >= .Machine$double.xmin)
-  expect_equal(nrow(d), 12948)
+  expect_equal(nrow(d), 12948L)
 })
 
 test_that("reading Multinest without trimming results works", {
   fname <- system.file("extdata/multinest", "chain_multi_1.txt.xz", package = "rcosmosis")
   d <- read.multinest(fname, remove.small = FALSE)
   expect_s3_class(d, "tbl_df")
-  expect_equal(nrow(d), 13498)
+  expect_equal(nrow(d), 13498L)
   expect_true(min(d$weight) == 0)
 })
 
