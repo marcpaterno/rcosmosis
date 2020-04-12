@@ -110,7 +110,9 @@ test_that("remove.burnin removes samples from each walker for emcee", {
 })
 
 test_that("reading Multinest output works", {
-  fname <- system.file("extdata/multinest", "chain_multi_1.txt.xz", package = "rcosmosis")
+  #root <- rprojroot::is_r_package
+  #fname <- root$find_file("inst/extdata/multinest/chain_multi_1.txt.xz")
+  fname <- system.file("extdata/multinest/chain_multi_1.txt.xz", package = "rcosmosis")
   d <- read.multinest(fname)
   expect_s3_class(d, "tbl_df")
   expect_true(min(d$weight) >= .Machine$double.xmin)
@@ -119,6 +121,7 @@ test_that("reading Multinest output works", {
 
 test_that("reading Multinest without trimming results works", {
   fname <- system.file("extdata/multinest", "chain_multi_1.txt.xz", package = "rcosmosis")
+  expect_equal(file.exists(fname), TRUE)
   d <- read.multinest(fname, remove.small = FALSE)
   expect_s3_class(d, "tbl_df")
   expect_equal(nrow(d), 13498L)
@@ -126,6 +129,41 @@ test_that("reading Multinest without trimming results works", {
 })
 
 test_that("reading a matter power directory works", {
-  d <- make.matterpower.dataframe(here::here("inst/extdata/demo_output_1/matter_power_nl"), "nl")
+  dirname <- system.file("extdata/demo_output_1/matter_power_nl", package = "rcosmosis")
+  d <- make.matterpower.dataframe(dirname, "nl")
   expect_s3_class(d, "tbl_df")
+  expect_equal(nrow(d), 80200)
+})
+
+test_that("reading matter power dataframe from missing directory returns empty dataframe", {
+  d <- make.matterpower.dataframe("/dev/nonexistent nonsense")
+  expect_s3_class(d, "tbl_df")
+  expect_equal(nrow(d), 0)
+})
+
+test_that("cosmo.scan works", {
+  dirname <- system.file("extdata/demo_output_1/matter_power_nl", package = "rcosmosis")
+  x <- cosmo.scan(dirname, "k_h.txt")
+  expect_vector(x, ptype = numeric(), size = 200)
+})
+
+test_that("reading theory dataframe works", {
+  dirname <- system.file("extdata/demo_output_1/cmb_cl", package = "rcosmosis")
+  filenames <- Sys.glob(paste(dirname, "*.txt", sep = "/"))
+  nfiles <- length(filenames)
+  d <- make.theory.dataframe(filenames)
+  expect_s3_class(d, "data.frame")
+  expect_equal(length(d), nfiles)
+  expect_equal(length(d), 5)
+  expect_named(d, c("bb", "ee", "ell", "te", "tt"), ignore.order = TRUE)
+})
+
+test_that("nchain on empty tibble", {
+  empty <- tibble::tibble(x = c(), chain = c())
+  expect_equal(nchain(empty), 0)
+})
+
+test_that("nchain works on normal tibble", {
+  samples <- read.metropolis.hastings(get_mh_fileglob())
+  expect_equal(nchain(samples), 32L)
 })
