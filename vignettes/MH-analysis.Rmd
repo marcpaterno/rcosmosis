@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 5)
 library(tidyverse)
 library(rcosmosis)
 ```
@@ -66,24 +66,25 @@ Since there are too many chains to visualize this, we look only at the first 8
 chains. We also sample the chains sparsely, showing only 1 sample in `r nthin`:
 
 ```{r}
+alpha = 0.3
 filter(samples, sample < nburn, sample %% nthin == 0, chain %in% 1:8) %>%
   ggplot(aes(sample, omega_m, color = factor(chain))) +
-  geom_point(show.legend = FALSE) +
-  geom_path(show.legend = FALSE)
+  geom_path(alpha = alpha, show.legend = FALSE) +
+  ylab(latex2exp::TeX("$\\Omega_m$"))
 ```
 
 ```{r}
 filter(samples, sample < nburn, sample %% nthin == 0, chain %in% 1:8) %>%
   ggplot(aes(sample, sigma8_input, color = factor(chain))) +
-  geom_point(show.legend = FALSE) +
-  geom_path(show.legend = FALSE)
+  geom_path(alpha = alpha, show.legend = FALSE) +
+  ylab(latex2exp::TeX("$\\sigma_8$"))
+
 ```
 
 ```{r}
 filter(samples, sample < nburn, sample %% nthin == 0, chain %in% 1:8) %>%
   ggplot(aes(sample, concentration, color = factor(chain))) +
-  geom_point(show.legend = FALSE) +
-  geom_path(show.legend = FALSE)
+  geom_path(alpha = alpha, show.legend = FALSE)
 ```
 
 We can also look at how the marginal density for each parameter converges as we go through
@@ -206,13 +207,11 @@ This reshaping allows us to condition the plot on the name of the physical
 parameter, and thus to have a single graphic to plot.
 
 The transformation of the data is done using `tidyr::pivot_longer`.
-We select only 1 in 50 samples, to avoid overcrowding the plot.
 
 ```{r}
 x <-
   samples %>%
   filter(sample > nburn) %>%
-  filter(sample %% 50 == 0) %>%
   pivot_longer(-c(sample,chain), names_to = "param", values_to = "val")
 ```
 

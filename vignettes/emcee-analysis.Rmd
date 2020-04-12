@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 5)
 library(tidyverse)
 library(rcosmosis)
 ```
@@ -26,7 +26,8 @@ and a column `sample`, which indicates a sample number within the series from th
 
 ```{r}
 root <- rprojroot::is_r_package
-samples <- read.emcee(root$find_file("inst/extdata/chain_emcee_1024.txt.xz"))
+samples <-
+  read.emcee(root$find_file("inst/extdata/chain_emcee_1024.txt.xz"))
 head(samples) %>% knitr::kable()
 ```
 
@@ -43,7 +44,8 @@ for a total of `r nsamples` samples.
 ## Has the chain converged?
 
 ```{r}
-nburn <- 300
+nburn <- 100
+nthin <- 10
 ```
 
 
@@ -58,29 +60,34 @@ One thing we want is see is *mixing*. It is important that the different walkers
 do not produce traces that stay separated; they should "forget" their initial
 values, and produce traces that eventually are well-mixed.
 
-Since there are too many walkers to visualize this, we look only at the first 8 walkers:
+Since there are too many walkers to visualize this, we look only at the first 8 walkers.
+We also *thin* the samples by only plotting one in `r nthin`.
 
 
 ```{r}
-filter(samples, walker %in% 1:8) %>%
-  ggplot(aes(sample, omega_m, color = factor(walker))) +
-  geom_point(show.legend = FALSE) +
-  geom_path(show.legend = FALSE)
+thinned <- filter(samples, walker %in% 1:8, sample %% nthin == 0)
+alpha <- 0.3
+ggplot(thinned, aes(sample, omega_m, color = factor(walker))) +
+  geom_path(alpha = alpha ,show.legend = FALSE) +
+  ylab(latex2exp::TeX("$\\Omega_m$"))
 ```
 
 ```{r}
-filter(samples, walker %in% 1:4) %>%
-  ggplot(aes(sample, sigma8_input, color = factor(walker))) +
-  geom_point(show.legend = FALSE) +
-  geom_path(show.legend = FALSE)
+ggplot(thinned, aes(sample, sigma8_input, color = factor(walker))) +
+  geom_path(alpha = alpha, show.legend = FALSE) +
+  ylab(latex2exp::TeX("$\\sigma_8$"))
 ```
 
 ```{r}
-filter(samples, walker %in% 1:4) %>%
-  ggplot(aes(sample, concentration, color = factor(walker))) +
-  geom_point(show.legend = FALSE) +
-  geom_path(show.legend = FALSE)
+ggplot(thinned, aes(sample, concentration, color = factor(walker))) +
+  geom_path(alpha = alpha, show.legend = FALSE)
 ```
+
+
+## Posterior densities
+
+For all our analysis of posterior distributions, we'll drop the first `r nburn` elements of each chain.
+To make our plotting easier, we will re-organize the data:
 
 ```{r}
 x <-
@@ -88,21 +95,7 @@ x <-
   pivot_longer(-c(sample,walker), names_to = "param", values_to = "val")
 ```
 
-We can also look at how the marginal density for each parameter converges as we go through
-fixed-size batches of samples. We'll group the data by 20-sample batches (for each walker).
-As above, we need to re-organize the `samples` dataframe, but this time we don't thin out the samples,
-and we also assign samples to batches.
 
-```{r}
-b <- samples %>%
-  mutate(batch = sample %/% 20) %>%
-  pivot_longer(-c(sample, walker, batch), names_to = "param", values_to = "val")
-```
-
-
-## Posterior densities
-
-For all our analysis of posterior distributions, we'll drop the first `r nburn` elements of each chain.
 
 ### 1-d marginal densities
 
@@ -128,6 +121,9 @@ x %>%
   scale_x_log10()
 ```
 
+Clearly the posterior density for *concentration* is strongly influenced at the upper end by the prior density chosen for the parameter,
+which was flat on the range [1, 10].
+This parameter is not strongly constrained by these data.
 
 ### 2-d marginal densities
 
@@ -136,26 +132,36 @@ produces few, and easy to understand, artifacts in the plotting.
 We use a log scale for the density because of wide range of density.
 We also plot the contours produced by a 2D kernel density estimator,
 for comparison with the hexbin results.
+The contours show the regions of smallest area containing 68.2%, 95.4%, and 99.7% of the total
+probability (1, 2 and 3 sigma contours, if the posterior density were Gaussian).
 
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(omega_m, sigma8_input)
+  plot_density_2d(omega_m, sigma8_input) +
+  xlab(latex2exp::TeX("$\\Omega_m$")) +
+  ylab(latex2exp::TeX("$\\sigma_8$"))
+
 ```
 
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(omega_m, concentration, scale_y = scale_y_log10)
+  plot_density_2d(omega_m, concentration, scale_y = scale_y_log10) +
+  xlab(latex2exp::TeX("$\\Omega_m$"))
 ```
 
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(sigma8_input, concentration, scale_y = scale_y_log10)
+  plot_density_2d(sigma8_input, concentration, scale_y = scale_y_log10) +
+  xlab(latex2exp::TeX("$\\sigma_8$"))
 ```
 
 ### Statistical summaries
+
+To produce a table of statistical summaries,
+we again transform the data.
 
 ```{r}
 samples %>%
