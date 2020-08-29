@@ -8,7 +8,7 @@
 #'   values.
 #' @export
 cols2vmat <- function(d) {
-  checkmate::check_data_frame(d, ncols = 3)
+  checkmate::assert_data_frame(d, ncols = 3)
   d <- dplyr::arrange_all(d)
   xvals <- unique(dplyr::pull(d, 1))
   yvals <- unique(dplyr::pull(d, 2))

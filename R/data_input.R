@@ -185,11 +185,11 @@ read.cosmosis.grid <- function(fname)
 #'
 read.metropolis.hastings <- function(fileglob)
 {
-  checkmate::expect_scalar(fileglob)
-  checkmate::expect_string(fileglob)
+  checkmate::assert_scalar(fileglob)
+  checkmate::assert_string(fileglob)
   # Determine files to be read.
   fnames = Sys.glob(fileglob)
-  checkmate::expect_count(length(fnames), positive = TRUE)
+  checkmate::assert_count(length(fnames), positive = TRUE)
   # Read all files into list of dataframes.
   tbls <- lapply(fnames, read.cosmosis.mcmc)
   # Augment each dataframe with the chain number, and the sample numbers
@@ -214,10 +214,10 @@ read.metropolis.hastings <- function(fileglob)
 #'
 read.multinest <- function(fname, remove.small = TRUE)
 {
-  checkmate::expect_scalar(fname)
-  checkmate::expect_string(fname)
-  checkmate::expect_file_exists(fname)
-  checkmate::expect_scalar(remove.small)
+  checkmate::assert_scalar(fname)
+  checkmate::assert_string(fname)
+  checkmate::assert_file_exists(fname)
+  checkmate::assert_scalar(remove.small)
   d <- read.cosmosis.mcmc(fname)
   d$sample <- 1:nrow(d)
   if (remove.small)
@@ -283,13 +283,13 @@ mcmc.list.from.metropolis.hastings <- function(tbl)
 #'
 remove.burnin <- function(x, n)
 {
-  checkmate::expect_scalar(n)
+  checkmate::assert_scalar(n)
   dplyr::filter(x, .data$sample > n)
 }
 
 nchain <- function(x)
 {
-  checkmate::check_data_frame(x)
+  checkmate::assert_data_frame(x)
   length(unique(x$chain))
 }
 
