@@ -249,7 +249,7 @@ emcee.count.walkers <- function(txt) {
 mcmc.list.from.emcee <- function(tbl)
 {
   lst <- dplyr::group_by(tbl, .data$walker) %>%
-         dplyr::group_split(keep = FALSE)
+         dplyr::group_split(.keep = FALSE)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
 
@@ -265,7 +265,7 @@ mcmc.list.from.metropolis.hastings <- function(tbl)
 {
   lst <- dplyr::select(tbl, -c(.data$sample)) %>%
          dplyr::group_by(.data$chain) %>%
-         dplyr::group_split(keep = FALSE)
+         dplyr::group_split(.keep = FALSE)
   # Because the input dataframe might now have the same number of samples for each chain
   # (a sign that the run was terminated prematurely), truncate all to the shorted.
   min_length <- min(sapply(lst, nrow))

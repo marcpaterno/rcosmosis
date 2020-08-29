@@ -160,7 +160,7 @@ test_that("reading theory dataframe works", {
 
 test_that("nchain on empty tibble", {
   empty <- tibble::tibble(x = c(), chain = c())
-  expect_equal(nchain(empty), 0)
+  expect_equal(nrow(empty), 0L)
 })
 
 test_that("nchain works on normal tibble", {
