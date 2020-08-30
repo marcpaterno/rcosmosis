@@ -1,6 +1,6 @@
 Package: rcosmosis
 Title: R functions to support CosmoSIS
-Version: 0.0.0.9203
+Version: 0.0.0.9204
 Authors@R: "Marc Paterno <paterno@fnal.gov> [aut, cre]"
 Description: rcosmosis provides functions useful in the analysis of the
     output of CosmoSIS. CosmoSIS is a framework for structuring
@@ -18,7 +18,7 @@ Imports: checkmate(>= 2.0.0),
          magrittr(>= 1.5),
          mvtnorm(>= 1.1-0),
          MASS(>= 7.3),
-         methods(>= 4.0.2),
+         methods(>= 4.0.0),
          rlang(>= 0.4.7),
          rlist(>= 0.4.6.1),
          stringr(>= 1.4.0),
