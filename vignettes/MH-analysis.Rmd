@@ -28,6 +28,10 @@ and also containing a column `chain`, which indicates the identify of the chain 
 the sample,
 and a column `sample`, which indicates a sample number within that chain.
 
+While CosmoSIS writes chain output in uncompressed files, `rcosmosis` also
+supports reading compressed files. `xz` compression is especially effective in
+reducing the size of the chain output files.
+
 ```{r message=FALSE}
 root <- rprojroot::is_r_package
 samples <- read.metropolis.hastings(root$find_file("inst/extdata/metropolis-hastings/chain_metro_*.txt.xz"))
@@ -48,7 +52,7 @@ for a total of `r nsamples.total` samples.
 ## Graphical evaluation
 
 ```{r include = FALSE}
-nburn <- 3000
+nburn <- 6000
 nthin <- 50
 ```
 
@@ -94,13 +98,15 @@ and we also assign samples to batches.
 
 ```{r}
 batches <- samples %>%
-  filter(sample < 3000) %>%
+  #filter(sample < 3000) %>%
   mutate(batch = sample %/% 100) %>%
   pivot_longer(-c(sample, chain, batch),
                names_to = "param",
                values_to = "val")
+maxbatches <- max(batches$batch)
 ```
 
+We have `r maxbatches+1` batches.
 We can then histogram the posterior densities, and observe how they change from batch to batch.
 An animation would show this well, but they are prohibitively expensive to generate in vignettes.
 Here, we will look at the first batch and the last batch.
@@ -113,17 +119,17 @@ filter(batches, batch == 0) %>%
   facet_wrap(vars(param), scales = "free", ncol = 1) +
   labs(title = "Batch 0")
 
-filter(batches, batch == 29) %>%
+filter(batches, batch == 100) %>%
   ggplot(aes(val)) +
   geom_histogram(bins = 100) +
   geom_histogram(aes(y = ..density..), bins = 100) +
   facet_wrap(vars(param), scales = "free", ncol = 1) +
-  labs(title = "Batch 29")
+  labs(title = "Batch 100")
 ```
 
-The plots for "Batch 0" show that the distribution of generated samples is dominated by the priors
+The plots for the batch 0 show that the distribution of generated samples is dominated by the priors
 and the initial distribution of starting points of the chains.
-The plots for "Batch 29" show that by this time in the sampling the influence of the data is seen.
+The plots for batch 100 show that by this time in the sampling the influence of the data is seen.
 
 There are also commonly-used diagnostic statistics to assess convergence of chains.
 Several of these are implemented in R, in the package `coda`.
@@ -137,9 +143,11 @@ But first, let's look at a quirk of the data with which we have been working.
 
 ```{r}
 group_by(samples, chain) %>%    # group data by chain
-  summarize(nsamples = n()) %>% # for each chain, count number of samples
+  summarize(nsamples = n(),     # for each chain, count number of samples
+            .groups = "drop") %>% 
   group_by(nsamples) %>%        # group that data number of samples
-  summarize(nchains = n()) %>%  # count how many groups had each number of samples
+  summarize(nchains = n(),      # count how many groups had each number of samples
+            .groups = "drop") %>%
   knitr::kable()
 ```
 
@@ -184,7 +192,6 @@ plot(samples.thinned)
 The Gelman-Rubin statistic is a "potential scale reduction factor".
 Approximate convergence is diagnosed with the upper limit is close to 1.
 The function `gelman.plot` shows the evolution of the statistic as a function of sample (called *iteration* here).
-Unlike most others, this diagnostic
 
 ```{r}
 par(mar = rep(2, 4))
@@ -277,7 +284,8 @@ samples %>%
             sd = sd(val),
             mad = mad(val),
             "5%" = quantile(val, 0.05),
-            "95%" = quantile(val, 0.95)) %>%
+            "95%" = quantile(val, 0.95),
+            .groups = "drop") %>%
   knitr::kable()
 ```
 
