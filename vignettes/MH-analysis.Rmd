@@ -255,21 +255,23 @@ for comparison with the hexbin results.
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(omega_m, sigma8_input,
-                  xlabel = latex2exp::TeX("$\\Omega_m$"),
-                  ylabel = latex2exp::TeX("$\\sigma_8$"))
+  plot_density_2d(omega_m, sigma8_input) +
+    labs(x=latex2exp::TeX("$\\Omega_m$"),
+         y=latex2exp::TeX("$\\sigma_8$"))
 ```
 
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(omega_m, concentration, scale_y = scale_y_log10)
+  plot_density_2d(omega_m, concentration) +
+    scale_y_log10()
 ```
 
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(sigma8_input, concentration, scale_y = scale_y_log10)
+  plot_density_2d(sigma8_input, concentration) +
+    scale_y_log10()
 ```
 
 ## Statistical summaries

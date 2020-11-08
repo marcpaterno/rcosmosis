@@ -9,10 +9,6 @@ plot_density_2d(
   x,
   y,
   bins = 50,
-  xlabel = NULL,
-  ylabel = NULL,
-  scale_x = scale_x_continuous,
-  scale_y = scale_y_continuous,
   levels = c(0.6826895, 0.9544997, 0.9973002)
 )
 }
@@ -24,14 +20,6 @@ plot_density_2d(
 \item{y}{the variable to be plotted on the y-axis}
 
 \item{bins}{the numbers of bins for both `x` and `y`}
-
-\item{xlabel}{label for x axis; if NULL, then name of `x` is used}
-
-\item{ylabel}{label for y axis; if NULL, then name of `y` is used}
-
-\item{scale_x}{position scale function for `x`}
-
-\item{scale_y}{position scale function for `y`}
 
 \item{levels}{probability content to be included in each contour line}
 }

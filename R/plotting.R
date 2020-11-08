@@ -61,10 +61,6 @@ emcee.convergence.plot <-
 #' @param x the variable to be plotted on the x-axis
 #' @param y the variable to be plotted on the y-axis
 #' @param bins the numbers of bins for both `x` and `y`
-#' @param xlabel label for x axis; if NULL, then name of `x` is used
-#' @param ylabel label for y axis; if NULL, then name of `y` is used
-#' @param scale_x position scale function for `x`
-#' @param scale_y position scale function for `y`
 #' @param levels probability content to be included in each contour line
 #'
 #' @return a ggplot object
@@ -85,10 +81,6 @@ plot_density_2d <-
            x,
            y,
            bins = 50,
-           xlabel = NULL,
-           ylabel = NULL,
-           scale_x = scale_x_continuous,
-           scale_y = scale_y_continuous,
            levels = c(0.6826895, 0.9544997, 0.9973002))
 {
   x <- enquo(x)
@@ -100,14 +92,9 @@ plot_density_2d <-
   breaks <- find.contours(kde, levels = levels)
   dxy <- vmat2df(kde)
   ggplot(data = data, mapping = aes(x = !!x, y = !!y)) +
-    scale_x() +
-    scale_y() +
     geom_hex(mapping = aes(fill = stat(log(density))), bins = bins, show.legend = FALSE) +
     #geom_hex(mapping = aes(fill = stat(.data$count)), bins = bins, show.legend = FALSE) +
     scale_fill_continuous(type = "gradient") +
-    geom_contour(data = dxy, mapping = aes(x, y, z = .data$z), breaks = breaks, color = "white") +
-    labs(x = ifelse(is.null(xlabel), quo_name(x), xlabel),
-         y = ifelse(is.null(ylabel), quo_name(y), ylabel)) +
-    theme_bw()
+    geom_contour(data = dxy, mapping = aes(x, y, z = .data$z), breaks = breaks, color = "white")
 }
 

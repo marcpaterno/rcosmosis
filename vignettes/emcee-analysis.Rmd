@@ -149,15 +149,17 @@ samples %>%
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(omega_m, concentration, scale_y = scale_y_log10) +
-  xlab(latex2exp::TeX("$\\Omega_m$"))
+  plot_density_2d(omega_m, concentration,) +
+    scale_y_log10() +
+    xlab(latex2exp::TeX("$\\Omega_m$"))
 ```
 
 ```{r}
 samples %>%
   filter(sample > nburn) %>%
-  plot_density_2d(sigma8_input, concentration, scale_y = scale_y_log10) +
-  xlab(latex2exp::TeX("$\\sigma_8$"))
+  plot_density_2d(sigma8_input, concentration) +
+    scale_y_log10() +
+    xlab(latex2exp::TeX("$\\sigma_8$"))
 ```
 
 ### Statistical summaries
