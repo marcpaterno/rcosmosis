@@ -61,3 +61,13 @@ test_that("finding contours in unit bivarian gaussian works", {
   expect_lte(frac_diff(p.30, 0.30), 0.01)
   expect_lte(frac_diff(p.50, 0.50), 0.01)
 })
+
+test_that("plot_density_2d can be called", {
+  dirname <- system.file("extdata", "run20", package = "rcosmosis")
+  fglob <- file.path(dirname, "chain_metro_20_*.txt.xz")
+  samples <- read.metropolis.hastings(fglob)
+  p1 <-
+    dplyr::filter(samples, sample > 100) %>%
+    plot_density_2d(omega_m, sigma8_input)
+  expect_s3_class(p1, "ggplot")
+})

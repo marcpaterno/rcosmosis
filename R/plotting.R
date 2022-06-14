@@ -83,6 +83,7 @@ plot_density_2d <-
            bins = 50,
            levels = c(0.6826895, 0.9544997, 0.9973002))
 {
+
   x <- enquo(x)
   y <- enquo(y)
   dxy <- dplyr::select(data, !!x, !!y)
