@@ -28,7 +28,7 @@ and a column `sample`, which indicates a sample number within the series from th
 root <- rprojroot::is_r_package
 samples <-
   read.emcee(root$find_file("inst/extdata/chain_emcee_1024.txt.xz"))
-head(samples) %>% knitr::kable()
+head(samples) |> knitr::kable()
 ```
 
 ```{r}
@@ -93,7 +93,7 @@ To make our plotting easier, we will re-organize the data:
 
 ```{r}
 x <-
-  samples %>%
+  samples |>
   pivot_longer(-c(sample,walker), names_to = "param", values_to = "val")
 ```
 
@@ -104,8 +104,8 @@ x <-
 We use a combined histogram and kernel density plot to show the 1-d marginal distributions.
 
 ```{r}
-x %>%
-  filter(sample > nburn) %>%
+x |>
+  filter(sample > nburn) |>
   ggplot(aes(val)) +
   geom_histogram(aes(y = ..density..), bins = 50) + 
   geom_density(color = "red") +
@@ -114,8 +114,8 @@ x %>%
 
 The posterior for `concentration` has a long high-end tail, and so a log scale in *x* can be useful.
 ```{r}
-x %>%
-  filter(param == "concentration", sample > nburn) %>%
+x |>
+  filter(param == "concentration", sample > nburn) |>
   ggplot(aes(val)) +
   geom_histogram(aes(y = ..density..), bins = 50) +
   geom_density(color = "red") +
@@ -138,8 +138,8 @@ The contours show the regions of smallest area containing 68.2%, 95.4%, and 99.7
 probability (1, 2 and 3 sigma contours, if the posterior density were Gaussian).
 
 ```{r}
-samples %>%
-  filter(sample > nburn) %>%
+samples |>
+  filter(sample > nburn) |>
   plot_density_2d(omega_m, sigma8_input) +
   xlab(latex2exp::TeX("$\\Omega_m$")) +
   ylab(latex2exp::TeX("$\\sigma_8$"))
@@ -147,16 +147,16 @@ samples %>%
 ```
 
 ```{r}
-samples %>%
-  filter(sample > nburn) %>%
+samples |>
+  filter(sample > nburn) |>
   plot_density_2d(omega_m, concentration,) +
     scale_y_log10() +
     xlab(latex2exp::TeX("$\\Omega_m$"))
 ```
 
 ```{r}
-samples %>%
-  filter(sample > nburn) %>%
+samples |>
+  filter(sample > nburn) |>
   plot_density_2d(sigma8_input, concentration) +
     scale_y_log10() +
     xlab(latex2exp::TeX("$\\sigma_8$"))
@@ -168,17 +168,17 @@ To produce a table of statistical summaries,
 we again transform the data.
 
 ```{r}
-samples %>%
-  select(-c(walker, sample)) %>%
-  pivot_longer(everything(), names_to = "param", values_to = "val") %>%
-  group_by(param) %>%
+samples |>
+  select(-c(walker, sample)) |>
+  pivot_longer(everything(), names_to = "param", values_to = "val") |>
+  group_by(param) |>
   summarize(mean = mean(val),
             median = median(val),
             sd = sd(val),
             mad = mad(val),
             "5%" = quantile(val, 0.05),
             "95%" = quantile(val, 0.95),
-            .groups = "drop") %>%
+            .groups = "drop") |>
   knitr::kable()
 ```
 

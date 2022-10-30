@@ -181,7 +181,6 @@ read.cosmosis.grid <- function(fname)
 #' Metropolis-Hastings sampler output file to be read.
 #'
 #' @return a CosmoSIS MCMC dataframe
-#' @importFrom magrittr `%>%`
 #'
 read.metropolis.hastings <- function(fileglob)
 {
@@ -198,7 +197,7 @@ read.metropolis.hastings <- function(fileglob)
   tbls <- lapply(tbls_and_chain_ids,
                  function(x) {
                    ntmp <- nrow(x$df)
-                   x$df %>% dplyr::mutate(chain = x$chain, sample = 1:ntmp)
+                   x$df |> dplyr::mutate(chain = x$chain, sample = 1:ntmp)
                    })
   # Combine into one dataframe
   dplyr::bind_rows(tbls)
@@ -244,11 +243,10 @@ emcee.count.walkers <- function(txt) {
 #' @param tbl An emcee data.frame, as created by read.emcee
 #'
 #' @return an mcmc.list object
-#' @importFrom magrittr `%>%`
 #'
 mcmc.list.from.emcee <- function(tbl)
 {
-  lst <- dplyr::group_by(tbl, .data$walker) %>%
+  lst <- dplyr::group_by(tbl, .data$walker) |>
          dplyr::group_split(.keep = FALSE)
   coda::as.mcmc.list(lapply(lst, coda::as.mcmc))
 }
@@ -263,8 +261,8 @@ mcmc.list.from.emcee <- function(tbl)
 #'
 mcmc.list.from.metropolis.hastings <- function(tbl)
 {
-  lst <- dplyr::select(tbl, -c(.data$sample)) %>%
-         dplyr::group_by(.data$chain) %>%
+  lst <- dplyr::select(tbl, -c(.data$sample)) |>
+         dplyr::group_by(.data$chain) |>
          dplyr::group_split(.keep = FALSE)
   # Because the input dataframe might now have the same number of samples for each chain
   # (a sign that the run was terminated prematurely), truncate all to the shorted.

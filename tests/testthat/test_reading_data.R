@@ -37,7 +37,7 @@ test_that("reading EMCEE sampler output works", {
   expect_identical(nrow(samples), 25600L)
   expect_identical(names(samples), c("omega_m", "h0", "deltam", "alpha", "beta", "walker", "sample"))
   # Each walker should have he same range of sample values
-  ranges <- samples %>% dplyr::group_by(walker) %>% dplyr::summarize(first = min(sample), last = max(sample))
+  ranges <- samples |> dplyr::group_by(walker) |> dplyr::summarize(first = min(sample), last = max(sample))
   expect_equal(length(unique(ranges$first)), 1L)
   expect_equal(length(unique(ranges$last)), 1L)
   expect_equal(max(samples$sample), 400L)

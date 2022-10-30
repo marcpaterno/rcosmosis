@@ -54,9 +54,9 @@ test_that("finding contours in unit bivarian gaussian works", {
   # Find the contours for 0.10, 0.30, and 0.50 percentiles.
   contours <- find.contours(kde, c(0.70, 0.30, 0.50))
   # Test that the contained fractions are correct.
-  p.70 <- kde$z[kde$z >= contours[1]] %>% sum
-  p.30 <- kde$z[kde$z >= contours[2]] %>% sum
-  p.50 <- kde$z[kde$z >= contours[3]] %>% sum
+  p.70 <- kde$z[kde$z >= contours[1]] |> sum
+  p.30 <- kde$z[kde$z >= contours[2]] |> sum
+  p.50 <- kde$z[kde$z >= contours[3]] |> sum
   expect_lte(frac_diff(p.70, 0.70), 0.01)
   expect_lte(frac_diff(p.30, 0.30), 0.01)
   expect_lte(frac_diff(p.50, 0.50), 0.01)
@@ -67,7 +67,7 @@ test_that("plot_density_2d can be called", {
   fglob <- file.path(dirname, "chain_metro_20_*.txt.xz")
   samples <- read.metropolis.hastings(fglob)
   p1 <-
-    dplyr::filter(samples, sample > 100) %>%
+    dplyr::filter(samples, sample > 100) |>
     plot_density_2d(omega_m, sigma8_input)
   expect_s3_class(p1, "ggplot")
 })
