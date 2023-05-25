@@ -132,7 +132,7 @@ read.cosmosis.mcmc <- function(fname, burn = 0L, drop.nonsampling = TRUE)
   if (drop.nonsampling)
   {
     names_to_keep = setdiff(names(d), non.sampling.columns())
-    d <- dplyr::select(d, names_to_keep)
+    d <- dplyr::select(d, dplyr::all_of(names_to_keep))
   }
   tibble::as_tibble(d)
 }
@@ -261,7 +261,7 @@ mcmc.list.from.emcee <- function(tbl)
 #'
 mcmc.list.from.metropolis.hastings <- function(tbl)
 {
-  lst <- dplyr::select(tbl, -c(.data$sample)) |>
+  lst <- dplyr::select(tbl, -c(sample)) |>
          dplyr::group_by(.data$chain) |>
          dplyr::group_split(.keep = FALSE)
   # Because the input dataframe might now have the same number of samples for each chain

@@ -9,11 +9,11 @@ Description: rcosmosis provides functions useful in the analysis of the
     contained in repositories for individuals, collaborations, and the
     community at large. CosmoSIS is available at
     https://bitbucket.org/joezuntz/cosmosis.
-Requires: R (>= 3.5.0)
+Requires: R (>= 4.1.0)
 Depends: 
 Imports: checkmate(>= 2.1.0),
          coda(>= 0.19-4),
-         dplyr(>= 1.0.10),
+         dplyr(>= 1.1.2),
          ggplot2(>= 3.3.6),
          MASS(>= 7.3),
          methods(>= 4.0.0),
@@ -34,5 +34,5 @@ Suggests:
     tidyverse
 VignetteBuilder: knitr
 URL: https://github.com/marcpaterno/rcosmosis.
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
