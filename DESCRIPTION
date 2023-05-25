@@ -1,6 +1,6 @@
 Package: rcosmosis
 Title: R functions to support CosmoSIS
-Version: 0.0.0.9207
+Version: 0.0.0.9208
 Authors@R: "Marc Paterno <paterno@fnal.gov> [aut, cre]"
 Description: rcosmosis provides functions useful in the analysis of the
     output of CosmoSIS. CosmoSIS is a framework for structuring
@@ -11,10 +11,10 @@ Description: rcosmosis provides functions useful in the analysis of the
     https://bitbucket.org/joezuntz/cosmosis.
 Requires: R (>= 3.5.0)
 Depends: 
-Imports: checkmate(>= 2.0.0),
-         coda(>= 0.19-3),
-         dplyr(>= 1.0.2),
-         ggplot2(>= 3.3.2),
+Imports: checkmate(>= 2.1.0),
+         coda(>= 0.19-4),
+         dplyr(>= 1.0.10),
+         ggplot2(>= 3.3.6),
          MASS(>= 7.3),
          methods(>= 4.0.0),
          rlang(>= 0.4.7),
@@ -34,5 +34,5 @@ Suggests:
     tidyverse
 VignetteBuilder: knitr
 URL: https://github.com/marcpaterno/rcosmosis.
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Encoding: UTF-8
